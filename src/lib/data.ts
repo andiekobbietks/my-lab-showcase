@@ -4,6 +4,9 @@ export interface LabMedia {
   url: string;
   type: 'video' | 'gif' | 'image';
   caption?: string;
+  narration?: string;
+  narrationConfidence?: 'high' | 'medium' | 'low';
+  narrationSource?: 'foundry' | 'cloud' | 'text';
 }
 
 export interface Lab {
@@ -18,6 +21,8 @@ export interface Lab {
   repoUrl?: string;
   thumbnail?: string;
   media?: LabMedia[];
+  aiNarration?: string;
+  narrationSource?: 'foundry' | 'cloud' | 'text';
   createdAt: string;
 }
 

@@ -10,9 +10,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { Trash2, Plus, Save, Download, Upload, ArrowLeft } from 'lucide-react';
+import { Trash2, Plus, Save, Download, Upload, ArrowLeft, Sparkles, RefreshCw, Cpu, Cloud, FileText, Circle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { checkFoundryStatus } from '@/lib/foundry-local';
+import { generateNarration, type NarrationEngine, type NarrationProgress } from '@/lib/narration-engine';
 
 const Admin = () => {
   const { toast } = useToast();
@@ -273,9 +277,31 @@ const Admin = () => {
   );
 };
 
-// Lab form sub-component
+// Confidence badge colors
+const confidenceConfig = {
+  high: { label: 'High Confidence', className: 'bg-green-500/10 text-green-500 border-green-500/20' },
+  medium: { label: 'Medium Confidence', className: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' },
+  low: { label: 'Low Confidence', className: 'bg-red-500/10 text-red-500 border-red-500/20' },
+};
+
+const sourceConfig = {
+  foundry: { label: 'On-Device AI', icon: Cpu },
+  cloud: { label: 'Cloud AI', icon: Cloud },
+  text: { label: 'Text-Based', icon: FileText },
+};
+
+// Lab form sub-component with AI narration
 const LabForm = ({ lab, onSave, onCancel }: { lab: Lab; onSave: (l: Lab) => void; onCancel: () => void }) => {
+  const { toast } = useToast();
   const [form, setForm] = useState<Lab>({ ...lab, media: lab.media || [] });
+  const [foundryAvailable, setFoundryAvailable] = useState<boolean | null>(null);
+  const [engine, setEngine] = useState<NarrationEngine>('auto');
+  const [narrating, setNarrating] = useState(false);
+  const [progress, setProgress] = useState<NarrationProgress | null>(null);
+
+  useEffect(() => {
+    checkFoundryStatus().then(s => setFoundryAvailable(s.available));
+  }, []);
 
   const updateStep = (idx: number, val: string) => {
     const steps = [...form.steps];
@@ -296,6 +322,54 @@ const LabForm = ({ lab, onSave, onCancel }: { lab: Lab; onSave: (l: Lab) => void
   const removeMedia = (idx: number) => {
     setForm({ ...form, media: (form.media || []).filter((_, i) => i !== idx) });
   };
+
+  const handleGenerateNarration = async (mediaIndices?: number[]) => {
+    if (!form.media?.length) return;
+    setNarrating(true);
+    setProgress(null);
+
+    try {
+      const { mediaResults, summary } = await generateNarration(form, {
+        engine,
+        onProgress: setProgress,
+        mediaIndices,
+      });
+
+      // Update media with narration results
+      const updatedMedia = [...(form.media || [])];
+      for (const mr of mediaResults) {
+        updatedMedia[mr.mediaIndex] = {
+          ...updatedMedia[mr.mediaIndex],
+          narration: mr.result.narration,
+          narrationConfidence: mr.result.overallConfidence,
+          narrationSource: mr.result.source,
+        };
+      }
+
+      setForm({
+        ...form,
+        media: updatedMedia,
+        aiNarration: summary.narration,
+        narrationSource: summary.source,
+      });
+
+      toast({ title: 'Narration generated!', description: `Source: ${sourceConfig[summary.source].label}` });
+    } catch (err: any) {
+      toast({ title: 'Narration failed', description: err.message, variant: 'destructive' });
+    } finally {
+      setNarrating(false);
+      setProgress(null);
+    }
+  };
+
+  const progressPercent = progress ? ({
+    extracting: 20,
+    'analyzing-foundry': 50,
+    'analyzing-cloud': 50,
+    'generating-text': 70,
+    complete: 100,
+    error: 0,
+  }[progress.stage] || 0) : 0;
 
   return (
     <Card>
@@ -329,26 +403,131 @@ const LabForm = ({ lab, onSave, onCancel }: { lab: Lab; onSave: (l: Lab) => void
           </div>
           <p className="text-xs text-muted-foreground mb-3">Add URLs to MP4 videos, GIFs, or images. These will appear as interactive previews on your lab cards and in the detail view.</p>
           {(form.media || []).map((m, i) => (
-            <div key={i} className="flex gap-2 mb-3 items-start p-3 bg-secondary/20 border border-border rounded-md">
-              <div className="flex-1 space-y-2">
-                <Input value={m.url} onChange={e => updateMedia(i, 'url', e.target.value)} placeholder="https://... (MP4, GIF, or image URL)" />
-                <div className="flex gap-2">
-                  <select
-                    value={m.type}
-                    onChange={e => updateMedia(i, 'type', e.target.value)}
-                    className="bg-background border border-input rounded-md px-3 py-2 text-sm text-foreground"
-                  >
-                    <option value="video">Video (MP4)</option>
-                    <option value="gif">GIF</option>
-                    <option value="image">Image</option>
-                  </select>
-                  <Input value={m.caption || ''} onChange={e => updateMedia(i, 'caption', e.target.value)} placeholder="Caption (optional)" className="flex-1" />
+            <div key={i} className="mb-3 p-3 bg-secondary/20 border border-border rounded-md space-y-2">
+              <div className="flex gap-2 items-start">
+                <div className="flex-1 space-y-2">
+                  <Input value={m.url} onChange={e => updateMedia(i, 'url', e.target.value)} placeholder="https://... (MP4, GIF, or image URL)" />
+                  <div className="flex gap-2">
+                    <select
+                      value={m.type}
+                      onChange={e => updateMedia(i, 'type', e.target.value)}
+                      className="bg-background border border-input rounded-md px-3 py-2 text-sm text-foreground"
+                    >
+                      <option value="video">Video (MP4)</option>
+                      <option value="gif">GIF</option>
+                      <option value="image">Image</option>
+                    </select>
+                    <Input value={m.caption || ''} onChange={e => updateMedia(i, 'caption', e.target.value)} placeholder="Caption (optional)" className="flex-1" />
+                  </div>
                 </div>
+                <Button variant="ghost" size="icon" onClick={() => removeMedia(i)}><Trash2 className="h-4 w-4" /></Button>
               </div>
-              <Button variant="ghost" size="icon" onClick={() => removeMedia(i)}><Trash2 className="h-4 w-4" /></Button>
+
+              {/* Per-media narration */}
+              {m.narration && (
+                <div className="space-y-2 pt-2 border-t border-border/50">
+                  <div className="flex items-center gap-2">
+                    <Label className="text-xs">AI Narration</Label>
+                    {m.narrationSource && (
+                      <Badge variant="outline" className="text-xs">
+                        {sourceConfig[m.narrationSource]?.label || m.narrationSource}
+                      </Badge>
+                    )}
+                    {m.narrationConfidence && (
+                      <Badge variant="outline" className={`text-xs ${confidenceConfig[m.narrationConfidence].className}`}>
+                        {confidenceConfig[m.narrationConfidence].label}
+                      </Badge>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="ml-auto h-6 text-xs"
+                      onClick={() => handleGenerateNarration([i])}
+                      disabled={narrating}
+                    >
+                      <RefreshCw className="h-3 w-3 mr-1" />Re-generate
+                    </Button>
+                  </div>
+                  <Textarea
+                    value={m.narration}
+                    onChange={e => updateMedia(i, 'narration' as any, e.target.value)}
+                    rows={4}
+                    className="text-xs"
+                  />
+                </div>
+              )}
             </div>
           ))}
         </div>
+
+        {/* AI Narration Controls */}
+        {(form.media?.length ?? 0) > 0 && (
+          <Card className="border-primary/20 bg-primary/5">
+            <CardContent className="pt-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-semibold text-foreground">AI Narration</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Circle className={`h-2.5 w-2.5 ${foundryAvailable ? 'fill-green-500 text-green-500' : 'fill-red-500 text-red-500'}`} />
+                  <span className="text-xs text-muted-foreground">
+                    Foundry {foundryAvailable ? 'Connected' : 'Offline'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Label className="text-xs shrink-0">Engine:</Label>
+                <select
+                  value={engine}
+                  onChange={e => setEngine(e.target.value as NarrationEngine)}
+                  className="bg-background border border-input rounded-md px-3 py-1.5 text-sm text-foreground"
+                >
+                  <option value="auto">Auto (best available)</option>
+                  <option value="foundry">On-Device Only</option>
+                  <option value="cloud">Cloud Only</option>
+                  <option value="text">Text Only</option>
+                </select>
+                <Button
+                  size="sm"
+                  onClick={() => handleGenerateNarration()}
+                  disabled={narrating}
+                >
+                  <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+                  {narrating ? 'Generating...' : 'Generate Narration'}
+                </Button>
+              </div>
+
+              {narrating && progress && (
+                <div className="space-y-1">
+                  <Progress value={progressPercent} className="h-2" />
+                  <p className="text-xs text-muted-foreground">{progress.message}</p>
+                </div>
+              )}
+
+              {/* Overall lab narration */}
+              {form.aiNarration && (
+                <div className="space-y-2 pt-2 border-t border-border/50">
+                  <div className="flex items-center gap-2">
+                    <Label className="text-xs">Lab Summary</Label>
+                    {form.narrationSource && (
+                      <Badge variant="outline" className="text-xs">
+                        {sourceConfig[form.narrationSource]?.label || form.narrationSource}
+                      </Badge>
+                    )}
+                  </div>
+                  <Textarea
+                    value={form.aiNarration}
+                    onChange={e => setForm({ ...form, aiNarration: e.target.value })}
+                    rows={6}
+                    className="text-xs"
+                  />
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         <div className="flex gap-2">
           <Button onClick={() => onSave(form)}><Save className="h-4 w-4 mr-2" />Save</Button>

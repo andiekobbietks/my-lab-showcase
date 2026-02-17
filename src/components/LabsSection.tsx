@@ -1,10 +1,16 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { getLabs, Lab, LabMedia } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ExternalLink, FlaskConical, Target, Server, CheckCircle2, CircleDot, Play, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ExternalLink, FlaskConical, Target, Server, CheckCircle2, CircleDot, Play, ChevronLeft, ChevronRight, Sparkles, Cpu, Cloud, FileText, AlertTriangle } from 'lucide-react';
+
+const sourceConfig = {
+  foundry: { label: 'On-Device AI', icon: Cpu },
+  cloud: { label: 'Cloud AI', icon: Cloud },
+  text: { label: 'Text-Based', icon: FileText },
+};
 
 const MediaPreview = ({ media, className = '' }: { media: LabMedia; className?: string }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -50,7 +56,35 @@ const MediaPreview = ({ media, className = '' }: { media: LabMedia; className?: 
   );
 };
 
-const MediaGallery = ({ media }: { media: LabMedia[] }) => {
+const NarrationCard = ({ media }: { media: LabMedia }) => {
+  if (!media.narration) return null;
+
+  const SourceIcon = media.narrationSource ? sourceConfig[media.narrationSource]?.icon : FileText;
+
+  return (
+    <div className="mt-3 p-4 bg-secondary/30 border border-border rounded-lg space-y-2">
+      <div className="flex items-center gap-2">
+        <Sparkles className="h-3.5 w-3.5 text-primary" />
+        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">AI Walkthrough</span>
+        {media.narrationSource && (
+          <Badge variant="outline" className="text-xs ml-auto">
+            <SourceIcon className="h-3 w-3 mr-1" />
+            {sourceConfig[media.narrationSource]?.label}
+          </Badge>
+        )}
+      </div>
+      <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{media.narration}</p>
+      {media.narrationConfidence && media.narrationConfidence !== 'high' && (
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <AlertTriangle className="h-3 w-3" />
+          <span>{media.narrationConfidence === 'medium' ? 'Some observations may need verification' : 'Low confidence — review recommended'}</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const MediaGallery = ({ media, showNarration }: { media: LabMedia[]; showNarration: boolean }) => {
   const [current, setCurrent] = useState(0);
   if (!media.length) return null;
 
@@ -99,6 +133,9 @@ const MediaGallery = ({ media }: { media: LabMedia[] }) => {
           ))}
         </div>
       )}
+
+      {/* Narration card synced to current media */}
+      {showNarration && <NarrationCard media={media[current]} />}
     </div>
   );
 };
@@ -144,9 +181,12 @@ const LabsSection = () => {
   const labs = getLabs();
   const [selected, setSelected] = useState<Lab | null>(null);
   const [filter, setFilter] = useState<string | null>(null);
+  const [showNarration, setShowNarration] = useState(false);
 
   const allTags = [...new Set(labs.flatMap(l => l.tags))];
   const filtered = filter ? labs.filter(l => l.tags.includes(filter)) : labs;
+
+  const hasAnyNarration = selected?.media?.some(m => m.narration) || !!selected?.aiNarration;
 
   return (
     <section id="labs" className="py-20">
@@ -171,7 +211,7 @@ const LabsSection = () => {
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map(lab => (
-              <Card key={lab.id} className="cursor-pointer hover:border-primary/50 transition-colors overflow-hidden" onClick={() => setSelected(lab)}>
+              <Card key={lab.id} className="cursor-pointer hover:border-primary/50 transition-colors overflow-hidden" onClick={() => { setSelected(lab); setShowNarration(false); }}>
                 <CardHeader className="relative">
                   <CardThumbnail lab={lab} />
                   <CardTitle className="text-lg">{lab.title}</CardTitle>
@@ -199,9 +239,39 @@ const LabsSection = () => {
               </DialogHeader>
 
               <div className="space-y-6 mt-2">
+                {/* AI Walkthrough toggle */}
+                {hasAnyNarration && (
+                  <div className="flex justify-end">
+                    <Button
+                      variant={showNarration ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setShowNarration(!showNarration)}
+                    >
+                      <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+                      AI Walkthrough
+                    </Button>
+                  </div>
+                )}
+
+                {/* Overall AI summary */}
+                {showNarration && selected.aiNarration && (
+                  <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-primary" />
+                      <span className="text-xs font-semibold uppercase tracking-wider text-primary">AI Lab Summary</span>
+                      {selected.narrationSource && (
+                        <Badge variant="outline" className="text-xs ml-auto">
+                          {sourceConfig[selected.narrationSource]?.label}
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{selected.aiNarration}</p>
+                  </div>
+                )}
+
                 {/* Media gallery */}
                 {selected.media && selected.media.length > 0 && (
-                  <MediaGallery media={selected.media} />
+                  <MediaGallery media={selected.media} showNarration={showNarration} />
                 )}
 
                 {/* Objective & Environment cards side by side */}
