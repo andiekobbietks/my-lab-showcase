@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ExternalLink, FlaskConical } from 'lucide-react';
+import { ExternalLink, FlaskConical, Target, Server, CheckCircle2, CircleDot } from 'lucide-react';
 
 const LabsSection = () => {
   const labs = getLabs();
@@ -56,37 +56,79 @@ const LabsSection = () => {
           {selected && (
             <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>{selected.title}</DialogTitle>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {selected.tags.map(t => <Badge key={t} variant="secondary">{t}</Badge>)}
+                </div>
+                <DialogTitle className="text-2xl font-bold tracking-tight">{selected.title}</DialogTitle>
+                <p className="text-muted-foreground text-sm mt-1">{selected.description}</p>
               </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-semibold text-foreground mb-1">Objective</h4>
-                  <p className="text-muted-foreground text-sm">{selected.objective}</p>
+
+              <div className="space-y-6 mt-2">
+                {/* Objective & Environment cards side by side */}
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {selected.objective && (
+                    <div className="flex gap-3 p-4 bg-secondary/30 border border-border rounded-lg">
+                      <Target className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">Objective</p>
+                        <p className="text-sm text-foreground leading-relaxed">{selected.objective}</p>
+                      </div>
+                    </div>
+                  )}
+                  {selected.environment && (
+                    <div className="flex gap-3 p-4 bg-secondary/30 border border-border rounded-lg">
+                      <Server className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">Environment</p>
+                        <p className="text-sm text-foreground leading-relaxed">{selected.environment}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <h4 className="font-semibold text-foreground mb-1">Environment</h4>
-                  <p className="text-muted-foreground text-sm">{selected.environment}</p>
-                </div>
-                {selected.steps.length > 0 && (
+
+                {/* Timeline steps */}
+                {selected.steps.length > 0 && selected.steps.some(s => s.trim()) && (
                   <div>
-                    <h4 className="font-semibold text-foreground mb-1">Steps</h4>
-                    <ol className="list-decimal list-inside text-sm text-muted-foreground space-y-1">
-                      {selected.steps.map((s, i) => <li key={i}>{s}</li>)}
-                    </ol>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">Process</p>
+                    <div className="relative pl-6">
+                      {/* Timeline line */}
+                      <div className="absolute left-[9px] top-2 bottom-2 w-px bg-border" />
+                      <div className="space-y-4">
+                        {selected.steps.filter(s => s.trim()).map((step, i, arr) => (
+                          <div key={i} className="relative flex gap-4 items-start">
+                            {/* Timeline dot */}
+                            <div className="absolute -left-6 top-1">
+                              {i === arr.length - 1 ? (
+                                <CheckCircle2 className="h-[18px] w-[18px] text-primary" />
+                              ) : (
+                                <CircleDot className="h-[18px] w-[18px] text-muted-foreground" />
+                              )}
+                            </div>
+                            <div className="flex-1 pb-1">
+                              <span className="text-xs font-mono text-muted-foreground mr-2">Step {i + 1}</span>
+                              <p className="text-sm text-foreground leading-relaxed mt-0.5">{step}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 )}
-                <div>
-                  <h4 className="font-semibold text-foreground mb-1">Outcome</h4>
-                  <p className="text-muted-foreground text-sm">{selected.outcome}</p>
-                </div>
+
+                {/* Outcome */}
+                {selected.outcome && (
+                  <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">Outcome</p>
+                    <p className="text-sm text-foreground leading-relaxed">{selected.outcome}</p>
+                  </div>
+                )}
+
+                {/* Repo link */}
                 {selected.repoUrl && (
                   <Button variant="outline" size="sm" asChild>
                     <a href={selected.repoUrl} target="_blank" rel="noopener noreferrer"><ExternalLink className="h-4 w-4 mr-2" />View Repo</a>
                   </Button>
                 )}
-                <div className="flex flex-wrap gap-1">
-                  {selected.tags.map(t => <Badge key={t} variant="secondary">{t}</Badge>)}
-                </div>
               </div>
             </DialogContent>
           )}
