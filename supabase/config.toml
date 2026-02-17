@@ -1,1 +1,4 @@
 project_id = "grvwgmgolcbnkeqgtrku"
+
+[functions.narrate-lab]
+verify_jwt = false
