@@ -1,10 +1,144 @@
-import { useState } from 'react';
-import { getLabs, Lab } from '@/lib/data';
+import { useState, useRef, useEffect } from 'react';
+import { getLabs, Lab, LabMedia } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ExternalLink, FlaskConical, Target, Server, CheckCircle2, CircleDot } from 'lucide-react';
+import { ExternalLink, FlaskConical, Target, Server, CheckCircle2, CircleDot, Play, ChevronLeft, ChevronRight } from 'lucide-react';
+
+const MediaPreview = ({ media, className = '' }: { media: LabMedia; className?: string }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  if (media.type === 'video') {
+    return (
+      <div className={`relative group ${className}`}>
+        <video
+          ref={videoRef}
+          src={media.url}
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover rounded-md"
+          onMouseEnter={() => { videoRef.current?.play(); setIsPlaying(true); }}
+          onMouseLeave={() => { videoRef.current?.pause(); setIsPlaying(false); }}
+        />
+        {!isPlaying && (
+          <div className="absolute inset-0 flex items-center justify-center bg-background/40 rounded-md">
+            <Play className="h-8 w-8 text-foreground" />
+          </div>
+        )}
+        {media.caption && <p className="text-xs text-muted-foreground mt-1">{media.caption}</p>}
+      </div>
+    );
+  }
+
+  if (media.type === 'gif') {
+    return (
+      <div className={className}>
+        <img src={media.url} alt={media.caption || 'Lab demo'} className="w-full h-full object-cover rounded-md" />
+        {media.caption && <p className="text-xs text-muted-foreground mt-1">{media.caption}</p>}
+      </div>
+    );
+  }
+
+  return (
+    <div className={className}>
+      <img src={media.url} alt={media.caption || 'Lab screenshot'} className="w-full h-full object-cover rounded-md" />
+      {media.caption && <p className="text-xs text-muted-foreground mt-1">{media.caption}</p>}
+    </div>
+  );
+};
+
+const MediaGallery = ({ media }: { media: LabMedia[] }) => {
+  const [current, setCurrent] = useState(0);
+  if (!media.length) return null;
+
+  return (
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Demo Gallery</p>
+      <div className="relative">
+        <div className="aspect-video bg-secondary/30 border border-border rounded-lg overflow-hidden">
+          <MediaPreview media={media[current]} className="h-full" />
+        </div>
+        {media.length > 1 && (
+          <>
+            <Button
+              variant="secondary"
+              size="icon"
+              className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 opacity-80"
+              onClick={() => setCurrent(p => (p - 1 + media.length) % media.length)}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 opacity-80"
+              onClick={() => setCurrent(p => (p + 1) % media.length)}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </>
+        )}
+      </div>
+      {media.length > 1 && (
+        <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
+          {media.map((m, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrent(i)}
+              className={`shrink-0 w-16 h-12 rounded border overflow-hidden transition-all ${i === current ? 'border-primary ring-1 ring-primary' : 'border-border opacity-60 hover:opacity-100'}`}
+            >
+              {m.type === 'video' ? (
+                <video src={m.url} muted className="w-full h-full object-cover" />
+              ) : (
+                <img src={m.url} alt="" className="w-full h-full object-cover" />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const CardThumbnail = ({ lab }: { lab: Lab }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const firstMedia = lab.media?.[0];
+  if (!firstMedia) return null;
+
+  if (firstMedia.type === 'video') {
+    return (
+      <div className="relative aspect-video bg-secondary/30 overflow-hidden rounded-t-md -mx-6 -mt-6 mb-4">
+        <video
+          ref={videoRef}
+          src={firstMedia.url}
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover"
+          onMouseEnter={() => videoRef.current?.play()}
+          onMouseLeave={() => { videoRef.current?.pause(); if (videoRef.current) videoRef.current.currentTime = 0; }}
+        />
+        <div className="absolute bottom-2 left-2">
+          <Badge variant="secondary" className="text-xs"><Play className="h-3 w-3 mr-1" />Video</Badge>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="aspect-video bg-secondary/30 overflow-hidden rounded-t-md -mx-6 -mt-6 mb-4">
+      <img src={firstMedia.url} alt={lab.title} className="w-full h-full object-cover" />
+      {firstMedia.type === 'gif' && (
+        <div className="absolute bottom-2 left-2">
+          <Badge variant="secondary" className="text-xs">GIF</Badge>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const LabsSection = () => {
   const labs = getLabs();
@@ -37,8 +171,9 @@ const LabsSection = () => {
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map(lab => (
-              <Card key={lab.id} className="cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setSelected(lab)}>
-                <CardHeader>
+              <Card key={lab.id} className="cursor-pointer hover:border-primary/50 transition-colors overflow-hidden" onClick={() => setSelected(lab)}>
+                <CardHeader className="relative">
+                  <CardThumbnail lab={lab} />
                   <CardTitle className="text-lg">{lab.title}</CardTitle>
                   <CardDescription>{lab.description}</CardDescription>
                 </CardHeader>
@@ -64,6 +199,11 @@ const LabsSection = () => {
               </DialogHeader>
 
               <div className="space-y-6 mt-2">
+                {/* Media gallery */}
+                {selected.media && selected.media.length > 0 && (
+                  <MediaGallery media={selected.media} />
+                )}
+
                 {/* Objective & Environment cards side by side */}
                 <div className="grid sm:grid-cols-2 gap-4">
                   {selected.objective && (
@@ -91,12 +231,10 @@ const LabsSection = () => {
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">Process</p>
                     <div className="relative pl-6">
-                      {/* Timeline line */}
                       <div className="absolute left-[9px] top-2 bottom-2 w-px bg-border" />
                       <div className="space-y-4">
                         {selected.steps.filter(s => s.trim()).map((step, i, arr) => (
                           <div key={i} className="relative flex gap-4 items-start">
-                            {/* Timeline dot */}
                             <div className="absolute -left-6 top-1">
                               {i === arr.length - 1 ? (
                                 <CheckCircle2 className="h-[18px] w-[18px] text-primary" />

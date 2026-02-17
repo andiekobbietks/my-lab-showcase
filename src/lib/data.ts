@@ -1,5 +1,11 @@
 // Local data layer — all localStorage, easy to swap for API later
 
+export interface LabMedia {
+  url: string;
+  type: 'video' | 'gif' | 'image';
+  caption?: string;
+}
+
 export interface Lab {
   id: string;
   title: string;
@@ -11,6 +17,7 @@ export interface Lab {
   outcome: string;
   repoUrl?: string;
   thumbnail?: string;
+  media?: LabMedia[];
   createdAt: string;
 }
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import {
   getProfile, saveProfile, getLabs, saveLab, deleteLab,
   getBlogPosts, saveBlogPost, deleteBlogPost, exportAllData, importAllData,
-  Lab, BlogPost, Profile
+  Lab, BlogPost, Profile, LabMedia
 } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -72,7 +72,7 @@ const Admin = () => {
   // Lab handlers
   const newLab = (): Lab => ({
     id: crypto.randomUUID(), title: '', description: '', tags: [], objective: '',
-    environment: '', steps: [''], outcome: '', repoUrl: '', createdAt: new Date().toISOString()
+    environment: '', steps: [''], outcome: '', repoUrl: '', media: [], createdAt: new Date().toISOString()
   });
 
   const handleSaveLab = (lab: Lab) => {
@@ -275,12 +275,26 @@ const Admin = () => {
 
 // Lab form sub-component
 const LabForm = ({ lab, onSave, onCancel }: { lab: Lab; onSave: (l: Lab) => void; onCancel: () => void }) => {
-  const [form, setForm] = useState<Lab>({ ...lab });
+  const [form, setForm] = useState<Lab>({ ...lab, media: lab.media || [] });
 
   const updateStep = (idx: number, val: string) => {
     const steps = [...form.steps];
     steps[idx] = val;
     setForm({ ...form, steps });
+  };
+
+  const addMedia = () => {
+    setForm({ ...form, media: [...(form.media || []), { url: '', type: 'video', caption: '' }] });
+  };
+
+  const updateMedia = (idx: number, field: keyof LabMedia, val: string) => {
+    const media = [...(form.media || [])];
+    media[idx] = { ...media[idx], [field]: val };
+    setForm({ ...form, media });
+  };
+
+  const removeMedia = (idx: number) => {
+    setForm({ ...form, media: (form.media || []).filter((_, i) => i !== idx) });
   };
 
   return (
@@ -306,6 +320,36 @@ const LabForm = ({ lab, onSave, onCancel }: { lab: Lab; onSave: (l: Lab) => void
         </div>
         <div><Label>Outcome</Label><Textarea value={form.outcome} onChange={e => setForm({ ...form, outcome: e.target.value })} rows={2} /></div>
         <div><Label>Repo URL</Label><Input value={form.repoUrl || ''} onChange={e => setForm({ ...form, repoUrl: e.target.value })} /></div>
+
+        {/* Media section */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <Label>Media (Videos, GIFs, Screenshots)</Label>
+            <Button variant="outline" size="sm" onClick={addMedia}><Plus className="h-3 w-3 mr-1" />Media</Button>
+          </div>
+          <p className="text-xs text-muted-foreground mb-3">Add URLs to MP4 videos, GIFs, or images. These will appear as interactive previews on your lab cards and in the detail view.</p>
+          {(form.media || []).map((m, i) => (
+            <div key={i} className="flex gap-2 mb-3 items-start p-3 bg-secondary/20 border border-border rounded-md">
+              <div className="flex-1 space-y-2">
+                <Input value={m.url} onChange={e => updateMedia(i, 'url', e.target.value)} placeholder="https://... (MP4, GIF, or image URL)" />
+                <div className="flex gap-2">
+                  <select
+                    value={m.type}
+                    onChange={e => updateMedia(i, 'type', e.target.value)}
+                    className="bg-background border border-input rounded-md px-3 py-2 text-sm text-foreground"
+                  >
+                    <option value="video">Video (MP4)</option>
+                    <option value="gif">GIF</option>
+                    <option value="image">Image</option>
+                  </select>
+                  <Input value={m.caption || ''} onChange={e => updateMedia(i, 'caption', e.target.value)} placeholder="Caption (optional)" className="flex-1" />
+                </div>
+              </div>
+              <Button variant="ghost" size="icon" onClick={() => removeMedia(i)}><Trash2 className="h-4 w-4" /></Button>
+            </div>
+          ))}
+        </div>
+
         <div className="flex gap-2">
           <Button onClick={() => onSave(form)}><Save className="h-4 w-4 mr-2" />Save</Button>
           <Button variant="outline" onClick={onCancel}>Cancel</Button>
