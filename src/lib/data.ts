@@ -75,7 +75,7 @@ const KEYS = {
   contacts: 'portfolio_contacts',
 };
 
-const defaultProfile: Profile = {
+export const defaultProfile: Profile = {
   name: 'Your Name',
   title: 'Cloud & SDDC Infrastructure Engineer',
   tagline: 'Building software-defined data centres — from home lab to production.',

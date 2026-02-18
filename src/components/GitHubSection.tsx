@@ -1,44 +1,16 @@
-import { useEffect, useState } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Github, Star, GitFork, ExternalLink, RefreshCw } from 'lucide-react';
+import { RefreshCw, Github, ExternalLink, Star, GitFork } from 'lucide-react';
+import { defaultProfile } from '@/lib/data';
 import { Button } from '@/components/ui/button';
-
-interface Repo {
-  id: number;
-  name: string;
-  description: string | null;
-  html_url: string;
-  language: string | null;
-  stargazers_count: number;
-  forks_count: number;
-}
-
-interface ContributionDay {
-  date: string;
-  count: number;
-  level: number;
-}
+import { Card, CardContent } from '@/components/ui/card';
 
 const GitHubSection = () => {
-  const profile = useQuery(api.queries.getProfile);
-  const [repos, setRepos] = useState<Repo[]>([]);
-  const [loading, setLoading] = useState(true);
+  const convexProfile = useQuery(api.queries.getProfile);
 
-  useEffect(() => {
-    if (!profile || !profile.githubUsername) { setLoading(false); return; }
-    fetch(`https://api.github.com/users/${profile.githubUsername}/repos?sort=updated&per_page=6`)
-      .then(r => r.json())
-      .then(data => { if (Array.isArray(data)) setRepos(data); })
-      .catch(() => { })
-      .finally(() => setLoading(false));
-  }, [profile?.githubUsername]);
-
-  if (!profile) {
+  if (convexProfile === undefined) {
     return (
-      <section id="github" className="py-20 bg-card/50">
+      <section id="github" className="py-20 bg-background">
         <div className="container flex items-center justify-center p-12">
           <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -46,82 +18,71 @@ const GitHubSection = () => {
     );
   }
 
-  if (!profile.githubUsername) {
-    return (
-      <section id="github" className="py-20 bg-card/50">
-        <div className="container">
-          <h2 className="text-3xl font-bold text-foreground mb-4">GitHub</h2>
-          <p className="text-muted-foreground">Set your GitHub username in the admin panel to display your repos here.</p>
-        </div>
-      </section>
-    );
-  }
+  const profile = convexProfile || defaultProfile;
+  const username = profile.githubUsername || 'your-github-username';
 
   return (
-    <section id="github" className="py-20 bg-card/50">
-      <div className="container">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-foreground">GitHub</h2>
-          <Button variant="outline" size="sm" asChild>
-            <a href={`https://github.com/${profile.githubUsername}`} target="_blank" rel="noopener noreferrer">
-              <Github className="h-4 w-4 mr-2" />Profile
-            </a>
-          </Button>
-        </div>
-
-        {/* Contribution graph placeholder */}
-        <Card className="mb-8">
-          <CardContent className="p-6">
-            <p className="text-sm text-muted-foreground mb-3">Contribution Activity</p>
-            <div className="flex items-center gap-1 overflow-x-auto pb-2">
-              {Array.from({ length: 52 }, (_, week) => (
-                <div key={week} className="flex flex-col gap-1">
-                  {Array.from({ length: 7 }, (_, day) => {
-                    const level = Math.floor(Math.random() * 5);
-                    return (
-                      <div
-                        key={day}
-                        className="w-3 h-3 rounded-sm"
-                        style={{
-                          backgroundColor: level === 0
-                            ? 'hsl(var(--muted) / 0.3)'
-                            : `hsl(var(--primary) / ${0.2 + level * 0.2})`
-                        }}
-                      />
-                    );
-                  })}
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {loading ? (
-          <p className="text-muted-foreground">Loading repos…</p>
-        ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {repos.map(repo => (
-              <Card key={repo.id}>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Github className="h-4 w-4 shrink-0" />
-                    <a href={repo.html_url} target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors truncate">
-                      {repo.name}
-                    </a>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{repo.description || 'No description'}</p>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    {repo.language && <Badge variant="secondary">{repo.language}</Badge>}
-                    <span className="flex items-center gap-1"><Star className="h-3 w-3" />{repo.stargazers_count}</span>
-                    <span className="flex items-center gap-1"><GitFork className="h-3 w-3" />{repo.forks_count}</span>
+    <section id="github" className="py-24 bg-background">
+      <div className="container px-6">
+        <div className="max-w-5xl mx-auto">
+          <Card className="bg-zinc-900 border-zinc-800 text-white overflow-hidden rounded-3xl shadow-2xl">
+            <CardContent className="p-0">
+              <div className="grid md:grid-cols-2">
+                <div className="p-12 flex flex-col justify-center">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Github className="h-6 w-6 text-white" />
+                    <span className="text-xs font-bold uppercase tracking-widest text-zinc-400">Open Source Integrity</span>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+                  <h2 className="text-4xl font-bold mb-6 tracking-tight">Code Visibility</h2>
+                  <p className="text-zinc-400 text-lg mb-8 leading-relaxed">
+                    All lab configurations, automation scripts, and documentation are version-controlled and public. Transparency in infrastructure is key to reliable deployments.
+                  </p>
+                  <Button size="lg" variant="secondary" className="w-fit rounded-xl px-8 h-14 text-lg hover:bg-white hover:text-black transition-all" asChild>
+                    <a href={`https://github.com/${username}`} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-5 w-5 mr-2" /> Explore Repository
+                    </a>
+                  </Button>
+                </div>
+
+                <div className="bg-zinc-800/50 p-12 flex items-center justify-center border-l border-zinc-700/50">
+                  <div className="space-y-6 w-full">
+                    <div className="flex items-center justify-between p-4 bg-zinc-900/50 border border-zinc-700/50 rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 bg-zinc-700 rounded-full flex items-center justify-center">
+                          <Star className="h-5 w-5 text-yellow-500" />
+                        </div>
+                        <span className="font-bold">Active Projects</span>
+                      </div>
+                      <span className="text-zinc-500 font-mono">24+</span>
+                    </div>
+                    <div className="flex items-center justify-between p-4 bg-zinc-900/50 border border-zinc-700/50 rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 bg-zinc-700 rounded-full flex items-center justify-center">
+                          <GitFork className="h-5 w-5 text-blue-400" />
+                        </div>
+                        <span className="font-bold">Contributions</span>
+                      </div>
+                      <span className="text-zinc-500 font-mono">Last 12 Months</span>
+                    </div>
+                    <div className="text-center pt-4">
+                      <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-[0.2em] mb-4">GitHub Profile Activity</p>
+                      <div className="flex gap-1 justify-center">
+                        {[...Array(12)].map((_, i) => (
+                          <div key={i} className={`h-8 w-2 rounded-sm ${i % 3 === 0 ? 'bg-green-500' : 'bg-green-900/40'}`} />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          {!profile.githubUsername && (
+            <p className="text-center mt-6 text-[10px] text-muted-foreground/30 italic">
+              Showing generic GitHub section. Add your username in the <a href="/admin" className="underline hover:text-primary">Admin Panel</a> to link your live profile.
+            </p>
+          )}
+        </div>
       </div>
     </section>
   );
