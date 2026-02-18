@@ -12,6 +12,18 @@ dist
 dist-ssr
 *.local
 
+# Technical/Diagnostic scripts
+test_recorder_page.js
+diagnose_recorder.js
+capture_showcase.js
+capture_screenshots.js
+record_walkthrough.js
+seed_more_labs.js
+migrate_to_sanity.js
+netlify.toml.new
+screenshots/
+videos/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

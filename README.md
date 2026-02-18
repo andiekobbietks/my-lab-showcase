@@ -1,12 +1,11 @@
 # My Lab Showcase
 
-![Hero Section](file:///c:/Users/LLM-Test/MyLabsPortfolioSite/my-lab-showcase/hero_section.png)
+![Hero Section](./hero_section.png)
 
-**Welcome to your Lovable project**
 
 This project is a comprehensive portfolio designed to showcase hands-on technical labs, skills, and certifications. It features a public-facing showpiece and a powerful private admin panel for content management.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+**URL**: 
 
 ## 🚀 User Journey & Features
 
@@ -20,7 +19,7 @@ The entry point is a high-impact, responsive landing page designed to convert vi
 ### 2. The Admin Experience (Content Management)
 Managing your portfolio should be as easy as building it. The `/admin` route provides a secure, local-first CMS.
 
-![Admin Dashboard](file:///c:/Users/LLM-Test/MyLabsPortfolioSite/my-lab-showcase/admin_header.png)
+![Admin Dashboard](./admin_header.png)
 
 - **Profile Editor**: Update your bio, title, and social links in real-time.
 - **Skill Matrix**: Drag-and-drop or simple form entry to update your technical skills and proficiency levels.
@@ -29,8 +28,17 @@ Managing your portfolio should be as easy as building it. The `/admin` route pro
 ### 3. AI Narration Engine 🤖
 A unique feature of this portfolio is the **AI Narration Engine**.
 - **Input**: You provide a video or screenshot of your lab.
-- **Process**: The app uses on-device (Foundry) or cloud-based AI to analyze the visual content.
+- **Process**: The app uses on-device (Foundry) or cloud-based AI to analyse the visual content.
 - **Output**: It automatically generates a technical walkthrough and summary, saving you hours of writing documentation.
+
+### 4. Lab Recorder Station (Advanced Showcase) 🎥
+**New in v2.0**: A sophisticated, integrated recording suite for technical evidence.
+- **Interactive Terminal**: Real in-browser Node.js environment powered by **WebContainer API** and `xterm.js`.
+- **Universal Recorder**: Custom `rrweb` engine to capture perfect, low-latency DOM-event sessions from any lab environment.
+- **Draft Workflow**: Seamless **Record → Preview → Save as Draft** lifecycle management.
+
+> [!TIP]
+> **Hiring Managers & Recruiter Info**: For a deep dive into the architecture, user stories, and IR35 value proposition of these features, see the [Project Showcase Documentation](./docs/PROJECT_SHOWCASE.md).
 
 ## 🛠️ How it was Built
 
@@ -67,5 +75,3 @@ npm i
 npm run dev
 ```
 
-### Deployment
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.

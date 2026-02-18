@@ -16,7 +16,7 @@ This document provides a comprehensive overview of the **My Lab Showcase** portf
 ### 1. Public Portfolio Experience
 The homepage is designed to show your professional identity and hands-on laboratory work.
 
-![Homepage Screenshot](file:///c:/Users/LLM-Test/MyLabsPortfolioSite/my-lab-showcase/homepage.png)
+![Homepage Screenshot](./homepage.png)
 
 | Component | Workflow / Purpose |
 | :--- | :--- |
@@ -31,7 +31,7 @@ The homepage is designed to show your professional identity and hands-on laborat
 ### 2. Admin Management Panel
 Accessed via `/admin`, this panel allows for complete customization of the portfolio without editing code.
 
-![Admin Screenshot](file:///c:/Users/LLM-Test/MyLabsPortfolioSite/my-lab-showcase/admin.png)
+![Admin Screenshot](./admin.png)
 
 #### **Profile Management**
 - **Flow**: Update Name, Title, Bio, and Social links.
