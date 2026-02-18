@@ -11,6 +11,24 @@ This project is a comprehensive portfolio designed to showcase hands-on technica
 [![Launch Localhost](https://img.shields.io/badge/Launch-Localhost-blue?style=for-the-badge&logo=visual-studio-code)](./launch.bat)
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/andiekobbietks/my-lab-showcase)
 
+## 🏗️ Backend Architecture: The Convex Shift
+
+This project has been migrated from a local-only `localStorage` prototype to a high-performance, real-time backend powered by **Convex**.
+
+### Why Convex?
+- **Live Reactivity**: Every data change is pushed to the client in milliseconds. No more refreshing.
+- **Type-Safe Schema**: The database structure is defined in TypeScript (`convex/schema.ts`), ensuring the UI never breaks due to mismatched data.
+- **Scalable Recordings**: Lab recordings (rrweb) are now stored in a real database, allowing for complex, multi-minute sessions that exceed browser storage limits.
+- **Serverless Actions**: Enables offloading heavy AI narration tasks to the cloud.
+
+### Local Development with Convex
+To run the project with the live backend features:
+1.  **Install dependencies**: `npm install`
+2.  **Initialize Convex**: `npx convex dev` (Follow the prompts to link your account).
+3.  **Start Frontend**: `npm run dev`
+
+---
+
 ## 🗺️ Strategic User Journey
 
 ```mermaid
