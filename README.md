@@ -29,6 +29,17 @@ To run the project with the live backend features:
 
 ---
 
+## 🚀 The Evolution: From Prototype to Production
+
+This project represents a journey through modern web architecture:
+
+1.  **Phase 1: The Foundation**: A clean, responsive UI built with Vite, React, and Tailwind CSS, focused on showcasing static lab content and GitHub integration.
+2.  **Phase 2: The Recorder Hub**: Addition of the **Lab Recorder Station**, allowing for the capture of complex ESXi/vSphere interactions using `rrweb`.
+3.  **Phase 3: AI Intelligence**: Integration of the **Narration Engine**, providing automated technical walkthroughs for every lab.
+4.  **Phase 4: The Reactive Shift**: A complete data layer migration to **Convex**, enabling real-time multi-device sync and robust cloud persistence.
+
+---
+
 ## 🗺️ Strategic User Journey
 
 ```mermaid
