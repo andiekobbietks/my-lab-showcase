@@ -1,6 +1,7 @@
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { BookOpen, RefreshCw, Calendar, ArrowRight } from 'lucide-react';
 
 const SAMPLE_POSTS = [
