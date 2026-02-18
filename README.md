@@ -27,8 +27,17 @@ Managing your portfolio should be as easy as building it. The `/admin` route pro
 
 ### 3. Context-Aware AI Suggestion Chips ⚡
 **New in v2.1**: Real-time drafting assistance in the Admin panel.
-- **How it works**: As you fill out your profile or lab details, the **local AI** (Gemini Nano or Foundry) provides suggestion chips for titles, objectives, and skills.
+- **How it works**: As you fill out your profile or lab details, the **local or resilient remote AI** provides suggestion chips for titles, objectives, and skills.
 - **Benefit**: Speeds up documentation and ensures professional, consistent content across your portfolio.
+
+### 4. Zero-Gap AI Resilience 🛡️
+### 4. Unified AI Resilience (Gemini Nano, Foundry & Groq)
+**User Story**: *"As a hiring manager, I want to see how the candidate ensures system reliability and performance."*
+- **v2.2 Update**: Implemented a triple-layered AI lifecycle:
+  1. **Primary**: Chrome/Edge Built-in AI (`window.ai`) for zero-latency, private inference.
+  2. **Secondary**: Microsoft Foundry Local for high-fidelity technical vision tasks.
+  3. **Resilience Fallback**: High-speed remote inference via **Groq** or **Cerebras** (fallback configured in Admin settings).
+- **Benefit**: Proof of expertise in distributed AI systems, multi-provider integration, and "Zero-Gap" technical resiliency.
 
 ### 4. Lab Recorder Station (Advanced Showcase) 🎥
 A sophisticated, integrated recording suite for technical evidence.
