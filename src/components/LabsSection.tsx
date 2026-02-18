@@ -62,7 +62,7 @@ const MediaPreview = ({ media, className = '' }: { media: LabMedia; className?: 
 const NarrationCard = ({ media }: { media: LabMedia }) => {
   if (!media.narration) return null;
 
-  const SourceIcon = media.narrationSource ? sourceConfig[media.narrationSource]?.icon : FileText;
+  const SourceIcon = media.narrationSource ? (sourceConfig as any)[media.narrationSource]?.icon : FileText;
 
   return (
     <div className="mt-3 p-4 bg-secondary/30 border border-border rounded-lg space-y-2">
@@ -72,7 +72,7 @@ const NarrationCard = ({ media }: { media: LabMedia }) => {
         {media.narrationSource && (
           <Badge variant="outline" className="text-xs ml-auto">
             <SourceIcon className="h-3 w-3 mr-1" />
-            {sourceConfig[media.narrationSource]?.label}
+            {(sourceConfig as any)[media.narrationSource]?.label}
           </Badge>
         )}
       </div>
@@ -186,7 +186,7 @@ const LabsSection = () => {
   const [filter, setFilter] = useState<string | null>(null);
   const [showNarration, setShowNarration] = useState(false);
 
-  if (!labs) {
+  if (labs === undefined) {
     return (
       <section id="labs" className="py-20">
         <div className="container flex items-center justify-center p-12">
@@ -196,10 +196,10 @@ const LabsSection = () => {
     );
   }
 
-  const allTags = [...new Set(labs.flatMap((l: any) => l.tags))];
-  const filtered = filter ? labs.filter((l: any) => l.tags.includes(filter)) : labs;
+  const allTags = [...new Set((labs || []).flatMap((l: any) => l.tags || []))];
+  const filtered = filter ? (labs || []).filter((l: any) => (l.tags || []).includes(filter)) : (labs || []);
 
-  const hasAnyNarration = selected?.media?.some(m => m.narration) || !!selected?.aiNarration;
+  const hasAnyNarration = selected?.media?.some((m: any) => m.narration) || !!selected?.aiNarration;
 
   return (
     <section id="labs" className="py-20">
@@ -232,7 +232,7 @@ const LabsSection = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-1">
-                    {lab.tags.map(t => <Badge key={t} variant="secondary">{t}</Badge>)}
+                    {(lab.tags || []).map((t: string) => <Badge key={t} variant="secondary">{t}</Badge>)}
                   </div>
                 </CardContent>
               </Card>
@@ -245,7 +245,7 @@ const LabsSection = () => {
             <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
               <DialogHeader>
                 <div className="flex flex-wrap gap-2 mb-2">
-                  {selected.tags.map(t => <Badge key={t} variant="secondary">{t}</Badge>)}
+                  {(selected.tags || []).map((t: string) => <Badge key={t} variant="secondary">{t}</Badge>)}
                 </div>
                 <DialogTitle className="text-2xl font-bold tracking-tight">{selected.title}</DialogTitle>
                 <p className="text-muted-foreground text-sm mt-1">{selected.description}</p>
@@ -274,7 +274,7 @@ const LabsSection = () => {
                       <span className="text-xs font-semibold uppercase tracking-wider text-primary">AI Lab Summary</span>
                       {selected.narrationSource && (
                         <Badge variant="outline" className="text-xs ml-auto">
-                          {sourceConfig[selected.narrationSource]?.label}
+                          {(sourceConfig as any)[selected.narrationSource]?.label}
                         </Badge>
                       )}
                     </div>
@@ -310,13 +310,13 @@ const LabsSection = () => {
                 </div>
 
                 {/* Timeline steps */}
-                {selected.steps.length > 0 && selected.steps.some(s => s.trim()) && (
+                {selected.steps && selected.steps.length > 0 && selected.steps.some((s: string) => s.trim()) && (
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">Process</p>
                     <div className="relative pl-6">
                       <div className="absolute left-[9px] top-2 bottom-2 w-px bg-border" />
                       <div className="space-y-4">
-                        {selected.steps.filter(s => s.trim()).map((step, i, arr) => (
+                        {selected.steps.filter((s: string) => s.trim()).map((step: string, i: number, arr: any[]) => (
                           <div key={i} className="relative flex gap-4 items-start">
                             <div className="absolute -left-6 top-1">
                               {i === arr.length - 1 ? (

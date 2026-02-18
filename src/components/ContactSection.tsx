@@ -11,11 +11,11 @@ import { useToast } from '@/hooks/use-toast';
 
 const ContactSection = () => {
   const profile = useQuery(api.queries.getProfile);
-  const saveContactMutation = useMutation(api.mutations.saveContact as any); // I need to add this to mutations if not there
+  const saveContactMutation = useMutation(api.mutations.saveContact);
   const { toast } = useToast();
   const [form, setForm] = useState({ name: '', email: '', message: '' });
 
-  if (!profile) {
+  if (profile === undefined) {
     return (
       <section id="contact" className="py-20">
         <div className="container flex items-center justify-center p-12">
@@ -24,6 +24,8 @@ const ContactSection = () => {
       </section>
     );
   }
+
+  if (!profile) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

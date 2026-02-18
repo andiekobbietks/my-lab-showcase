@@ -6,7 +6,7 @@ import { BookOpen, RefreshCw } from 'lucide-react';
 const BlogSection = () => {
   const posts = useQuery(api.queries.getBlogPosts);
 
-  if (!posts) {
+  if (posts === undefined) {
     return (
       <section id="blog" className="py-20">
         <div className="container flex items-center justify-center p-12">
@@ -22,14 +22,14 @@ const BlogSection = () => {
         <h2 className="text-3xl font-bold text-foreground mb-2">Blog & Reflections</h2>
         <p className="text-muted-foreground mb-8">Lessons learned, career reflections, and lab write-ups.</p>
 
-        {posts.length === 0 ? (
+        {(posts || []).length === 0 ? (
           <Card className="p-12 text-center">
             <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">No blog posts yet. Add your first post from the admin panel at <code className="text-primary">/admin</code>.</p>
           </Card>
         ) : (
           <div className="grid md:grid-cols-2 gap-6">
-            {posts.slice().sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((post: any) => (
+            {(posts || []).slice().sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((post: any) => (
               <Card key={post._id}>
                 <CardHeader>
                   <CardDescription>{new Date(post.date).toLocaleDateString()}</CardDescription>

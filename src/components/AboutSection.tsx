@@ -8,7 +8,7 @@ import { Award, RefreshCw } from 'lucide-react';
 const AboutSection = () => {
   const profile = useQuery(api.queries.getProfile);
 
-  if (!profile) {
+  if (profile === undefined) {
     return (
       <section id="about" className="py-20 bg-card/50">
         <div className="container flex items-center justify-center p-12">
@@ -18,7 +18,9 @@ const AboutSection = () => {
     );
   }
 
-  const categories = [...new Set(profile.skills.map((s: any) => s.category))];
+  if (!profile) return null;
+
+  const categories = [...new Set((profile.skills || []).map((s: any) => s.category))];
 
   return (
     <section id="about" className="py-20 bg-card/50">

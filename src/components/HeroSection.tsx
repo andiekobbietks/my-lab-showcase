@@ -6,10 +6,24 @@ import { Github, Linkedin, Mail, ArrowDown, RefreshCw } from 'lucide-react';
 const HeroSection = () => {
   const profile = useQuery(api.queries.getProfile);
 
-  if (!profile) {
+  if (profile === undefined) {
     return (
       <section className="min-h-[50vh] flex items-center justify-center">
         <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+      </section>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <section className="min-h-[50vh] flex items-center justify-center p-12 text-center border-b border-dashed">
+        <div className="space-y-4 max-w-md mx-auto">
+          <h1 className="text-4xl font-bold">Welcome to Your Portfolio</h1>
+          <p className="text-muted-foreground">This site is now powered by **Convex**. To get started, seed your data or create a profile in the admin panel.</p>
+          <Button asChild>
+            <a href="/admin">Go to Admin Panel</a>
+          </Button>
+        </div>
       </section>
     );
   }

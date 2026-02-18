@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { getProfile } from '@/lib/data';
+import { useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Github, Star, GitFork, ExternalLink } from 'lucide-react';
+import { Github, Star, GitFork, ExternalLink, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface Repo {
@@ -22,18 +23,28 @@ interface ContributionDay {
 }
 
 const GitHubSection = () => {
-  const profile = getProfile();
+  const profile = useQuery(api.queries.getProfile);
   const [repos, setRepos] = useState<Repo[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!profile.githubUsername) { setLoading(false); return; }
+    if (!profile || !profile.githubUsername) { setLoading(false); return; }
     fetch(`https://api.github.com/users/${profile.githubUsername}/repos?sort=updated&per_page=6`)
       .then(r => r.json())
       .then(data => { if (Array.isArray(data)) setRepos(data); })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
-  }, [profile.githubUsername]);
+  }, [profile?.githubUsername]);
+
+  if (!profile) {
+    return (
+      <section id="github" className="py-20 bg-card/50">
+        <div className="container flex items-center justify-center p-12">
+          <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </section>
+    );
+  }
 
   if (!profile.githubUsername) {
     return (

@@ -7,7 +7,7 @@ import { Download, FileText, RefreshCw } from 'lucide-react';
 const CVSection = () => {
   const profile = useQuery(api.queries.getProfile);
 
-  if (!profile) {
+  if (profile === undefined) {
     return (
       <section id="cv" className="py-20 bg-card/50">
         <div className="container flex items-center justify-center p-12">
@@ -16,6 +16,8 @@ const CVSection = () => {
       </section>
     );
   }
+
+  if (!profile) return null;
 
   return (
     <section id="cv" className="py-20 bg-card/50">
