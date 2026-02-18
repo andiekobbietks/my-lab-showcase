@@ -5,7 +5,11 @@
 
 This project is a comprehensive portfolio designed to showcase hands-on technical labs, skills, and certifications. It features a public-facing showpiece and a powerful private admin panel for content management.
 
-**URL**: 
+**URL**: [Live Demo](https://my-lab-showcase.netlify.app)
+ 
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/andiekobbietks/my-lab-showcase)
+[![Launch Localhost](https://img.shields.io/badge/Launch-Localhost-blue?style=for-the-badge&logo=visual-studio-code)](./launch.bat)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/andiekobbietks/my-lab-showcase)
 
 ## 🚀 User Journey & Features
 
@@ -57,6 +61,17 @@ A sophisticated, integrated recording suite for technical evidence.
 
 > [!TIP]
 > **Hiring Managers & Recruiter Info**: For a deep dive into the architecture, user stories, and IR35 value proposition of these features, see the [Project Showcase Documentation](./docs/PROJECT_SHOWCASE.md).
+ 
+## 🎡 One-Click Deployment & Clean-Up
+ 
+### 🌐 Deploy to Netlify
+Click the **Deploy to Netlify** button at the top of this README to clone and host this portfolio in seconds. 
+- **To take it down**: Log in to your [Netlify Dashboard](https://app.netlify.com), go to `Site Settings` -> `Danger Zone` -> `Delete Site`.
+ 
+### 💻 One-Click Local Launch
+If you have the repo cloned locally:
+- **Windows**: Double-click [launch.bat](./launch.bat)
+- **Mac/Linux**: Run `sh launch.sh` inside the terminal.
 
 ## 🛠️ How it was Built
 
