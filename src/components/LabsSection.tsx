@@ -8,6 +8,7 @@ import { ExternalLink, FlaskConical, Target, Server, CheckCircle2, CircleDot, Pl
 
 const sourceConfig = {
   foundry: { label: 'On-Device AI', icon: Cpu },
+  browser: { label: 'Browser-Based AI', icon: Sparkles },
   cloud: { label: 'Cloud AI', icon: Cloud },
   text: { label: 'Text-Based', icon: FileText },
 };

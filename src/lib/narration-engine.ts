@@ -8,7 +8,7 @@
 import type { Lab, LabMedia } from './data';
 import type { ExtractedFrame } from './frame-extractor';
 import { extractFrames } from './frame-extractor';
-import { checkFoundryStatus, analyzeWithFoundry, type NarrationResult } from './foundry-local';
+import { checkOnDeviceAIStatus, analyzeOnDevice, type NarrationResult } from './foundry-local';
 import { analyzeWithCloud } from './narration-cloud';
 
 export type NarrationEngine = 'auto' | 'foundry' | 'cloud' | 'text';
@@ -38,9 +38,9 @@ export interface MediaNarrationResult {
  */
 function generateTextOnlyNarration(lab: Lab): NarrationResult {
   const parts: string[] = [];
-  
+
   parts.push(`In this lab exercise, "${lab.title}", the objective was to ${lab.objective.toLowerCase()}.`);
-  
+
   if (lab.environment) {
     parts.push(`The lab environment consisted of ${lab.environment}.`);
   }
@@ -107,9 +107,9 @@ async function narrateMedia(
         mediaTotal,
       });
 
-      const status = await checkFoundryStatus();
+      const status = await checkOnDeviceAIStatus();
       if (status.available) {
-        const result = await analyzeWithFoundry(frames, lab);
+        const result = await analyzeOnDevice(frames, lab);
         if (result.overallConfidence !== 'low' || engine === 'foundry') {
           return result;
         }
@@ -166,7 +166,7 @@ export async function generateNarration(
   mediaResults: MediaNarrationResult[];
   summary: NarrationResult;
 }> {
-  const { engine = 'auto', onProgress = () => {} } = options;
+  const { engine = 'auto', onProgress = () => { } } = options;
   const media = lab.media || [];
   const indices = options.mediaIndices || media.map((_, i) => i);
 
@@ -174,7 +174,7 @@ export async function generateNarration(
 
   for (const idx of indices) {
     if (idx >= media.length) continue;
-    
+
     const result = await narrateMedia(
       media[idx],
       lab,
@@ -189,8 +189,8 @@ export async function generateNarration(
 
   // Generate overall lab summary
   const allNarrations = mediaResults.map(r => r.result.narration).join('\n\n---\n\n');
-  const bestSource = mediaResults.length > 0 
-    ? mediaResults[0].result.source 
+  const bestSource = mediaResults.length > 0
+    ? mediaResults[0].result.source
     : 'text';
 
   const summary: NarrationResult = {
@@ -198,9 +198,9 @@ export async function generateNarration(
     segments: mediaResults.flatMap(r => r.result.segments),
     overallConfidence: mediaResults.length > 0
       ? mediaResults.reduce((worst, r) => {
-          const order = { low: 0, medium: 1, high: 2 };
-          return order[r.result.overallConfidence] < order[worst] ? r.result.overallConfidence : worst;
-        }, 'high' as 'high' | 'medium' | 'low')
+        const order = { low: 0, medium: 1, high: 2 };
+        return order[r.result.overallConfidence] < order[worst] ? r.result.overallConfidence : worst;
+      }, 'high' as 'high' | 'medium' | 'low')
       : 'low',
     source: bestSource,
   };

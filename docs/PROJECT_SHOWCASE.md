@@ -9,13 +9,14 @@ I have engineered a **Lab Recorder Station** integrated directly into the portfo
 
 ## 🏎️ Key Features & User Stories
 
-### 1. The Interactive Terminal (WebContainer Integration)
-**User Story**: *"As a hiring manager, I want to see how the candidate handles complex browser APIs beyond simple CRUD."*
-- **Implementation**: Integrated [StackBlitz WebContainers](https://webcontainers.io/) to provide a real Node.js environment in the browser.
-- **Tech Stack**: `@webcontainer/api`, `xterm.js`, and strict COOP/COEP header enforcement.
-- **Benefit**: Proof of expertise in modern web security and browser-based virtualisation.
+### 1. Unified On-Device AI (Gemini Nano & Foundry)
+**User Story**: *"As a hiring manager, I want to see how the candidate handles complex browser APIs and edge technologies."*
+- **Implementation**: Integrated the emerging **Prompt API (`window.ai`)** for Google Gemini Nano and Microsoft Edge AI, with seamless fallback to **Microsoft Foundry Local**.
+- **Tech Stack**: `window.ai.languageModel`, OpenAI-compatible REST APIs, and multi-provider health checks.
+- **Benefit**: Definitive proof of expertise in modern web security, browser-based runtime APIs, and privacy-first AI implementation.
 
-### 2. The Universal Recorder (rrweb Engine)
+### 2. The Interactive Terminal (WebContainer Integration)
+### 3. The Universal Recorder (rrweb Engine)
 **User Story**: *"As a project lead, I need tools that streamline evidence collection and training."*
 - **Implementation**: Custom injection of `rrweb` into target iframes and external tabs with full session control (Pause/Resume/Stop).
 - **Benefit**: Captures 100% reproducible sessions (not just video, but DOM events), allowing for searchable, interactive replays.

@@ -25,11 +25,11 @@ Managing your portfolio should be as easy as building it. The `/admin` route pro
 - **Skill Matrix**: Drag-and-drop or simple form entry to update your technical skills and proficiency levels.
 - **Lab Creator**: A sophisticated form to add new projects. defining objectives, environments, and step-by-step processes.
 
-### 3. AI Narration Engine 🤖
+### 3. Unified On-Device AI Narration 🤖
 A unique feature of this portfolio is the **AI Narration Engine**.
 - **Input**: You provide a video or screenshot of your lab.
-- **Process**: The app uses on-device (Foundry) or cloud-based AI to analyse the visual content.
-- **Output**: It automatically generates a technical walkthrough and summary, saving you hours of writing documentation.
+- **Process**: The app leverages **Unified On-Device AI** — supporting **Google Gemini Nano** (Chrome), **Microsoft Edge AI**, and **Microsoft Foundry Local**.
+- **Output**: It automatically generates a technical walkthrough and summary locally with maximum privacy and zero latency.
 
 ### 4. Lab Recorder Station (Advanced Showcase) 🎥
 **New in v2.0**: A sophisticated, integrated recording suite for technical evidence.

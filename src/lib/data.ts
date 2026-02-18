@@ -6,7 +6,7 @@ export interface LabMedia {
   caption?: string;
   narration?: string;
   narrationConfidence?: 'high' | 'medium' | 'low';
-  narrationSource?: 'foundry' | 'cloud' | 'text';
+  narrationSource?: 'foundry' | 'browser' | 'cloud' | 'text';
 }
 
 export interface Lab {
@@ -22,7 +22,7 @@ export interface Lab {
   thumbnail?: string;
   media?: LabMedia[];
   aiNarration?: string;
-  narrationSource?: 'foundry' | 'cloud' | 'text';
+  narrationSource?: 'foundry' | 'browser' | 'cloud' | 'text';
   createdAt: string;
   status?: 'draft' | 'published';
   rrwebRecording?: string; // JSON string of rrweb events

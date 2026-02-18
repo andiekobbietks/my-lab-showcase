@@ -15,7 +15,7 @@ import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { Trash2, Plus, Save, Download, Upload, ArrowLeft, Sparkles, RefreshCw, Cpu, Cloud, FileText, Circle, Rocket } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { checkFoundryStatus } from '@/lib/foundry-local';
+import { checkOnDeviceAIStatus, type OnDeviceAIStatus } from '@/lib/foundry-local';
 import { generateNarration, type NarrationEngine, type NarrationProgress } from '@/lib/narration-engine';
 
 const Admin = () => {
@@ -305,13 +305,13 @@ const sourceConfig = {
 const LabForm = ({ lab, onSave, onCancel }: { lab: Lab; onSave: (l: Lab) => void; onCancel: () => void }) => {
   const { toast } = useToast();
   const [form, setForm] = useState<Lab>({ ...lab, media: lab.media || [] });
-  const [foundryAvailable, setFoundryAvailable] = useState<boolean | null>(null);
   const [engine, setEngine] = useState<NarrationEngine>('auto');
   const [narrating, setNarrating] = useState(false);
   const [progress, setProgress] = useState<NarrationProgress | null>(null);
+  const [onDeviceStatus, setOnDeviceStatus] = useState<OnDeviceAIStatus | null>(null);
 
   useEffect(() => {
-    checkFoundryStatus().then(s => setFoundryAvailable(s.available));
+    checkOnDeviceAIStatus().then(setOnDeviceStatus);
   }, []);
 
   const updateStep = (idx: number, val: string) => {
@@ -481,9 +481,9 @@ const LabForm = ({ lab, onSave, onCancel }: { lab: Lab; onSave: (l: Lab) => void
                   <span className="text-sm font-semibold text-foreground">AI Narration</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Circle className={`h-2.5 w-2.5 ${foundryAvailable ? 'fill-green-500 text-green-500' : 'fill-red-500 text-red-500'}`} />
+                  <Circle className={`h-2.5 w-2.5 ${onDeviceStatus?.available ? 'fill-green-500 text-green-500' : 'fill-red-500 text-red-500'}`} />
                   <span className="text-xs text-muted-foreground">
-                    Foundry {foundryAvailable ? 'Connected' : 'Offline'}
+                    {onDeviceStatus?.provider === 'browser' ? 'Chrome/Edge AI' : 'Foundry'} {onDeviceStatus?.available ? 'Ready' : 'Offline'}
                   </span>
                 </div>
               </div>
