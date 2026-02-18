@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -31,8 +31,13 @@ const Admin = () => {
   const [editLab, setEditLab] = useState<Lab | null>(null);
 
   // Blog
-  const [posts, setPosts] = useState<BlogPost[]>(getBlogPosts());
+  const [posts, setPosts] = useState(getBlogPosts());
   const [editPost, setEditPost] = useState<BlogPost | null>(null);
+  const [onDeviceStatus, setOnDeviceStatus] = useState<OnDeviceAIStatus | null>(null);
+
+  useEffect(() => {
+    checkOnDeviceAIStatus().then(setOnDeviceStatus);
+  }, []);
 
   const refreshData = () => {
     setProfile(getProfile());
@@ -238,7 +243,7 @@ const Admin = () => {
           {/* LABS TAB */}
           <TabsContent value="labs" className="space-y-6">
             {editLab ? (
-              <LabForm lab={editLab} onSave={handleSaveLab} onCancel={() => setEditLab(null)} />
+              <LabForm lab={editLab} onSave={handleSaveLab} onCancel={() => setEditLab(null)} onDeviceStatus={onDeviceStatus} />
             ) : (
               <>
                 <Button onClick={() => setEditLab(newLab())}><Plus className="h-4 w-4 mr-2" />Add Lab</Button>
@@ -367,17 +372,12 @@ const sourceConfig = {
 };
 
 // Lab form sub-component with AI narration
-const LabForm = ({ lab, onSave, onCancel }: { lab: Lab; onSave: (l: Lab) => void; onCancel: () => void }) => {
+const LabForm = ({ lab, onSave, onCancel, onDeviceStatus }: { lab: Lab; onSave: (l: Lab) => void; onCancel: () => void; onDeviceStatus: OnDeviceAIStatus | null }) => {
   const { toast } = useToast();
   const [form, setForm] = useState<Lab>({ ...lab, media: lab.media || [] });
   const [engine, setEngine] = useState<NarrationEngine>('auto');
   const [narrating, setNarrating] = useState(false);
   const [progress, setProgress] = useState<NarrationProgress | null>(null);
-  const [onDeviceStatus, setOnDeviceStatus] = useState<OnDeviceAIStatus | null>(null);
-
-  useEffect(() => {
-    checkOnDeviceAIStatus().then(setOnDeviceStatus);
-  }, []);
 
   const updateStep = (idx: number, val: string) => {
     const steps = [...form.steps];
