@@ -9,13 +9,17 @@ I have engineered a **Lab Recorder Station** integrated directly into the portfo
 
 ## 🏎️ Key Features & User Stories
 
-### 1. Unified On-Device AI (Gemini Nano & Foundry)
-**User Story**: *"As a hiring manager, I want to see how the candidate handles complex browser APIs and edge technologies."*
-- **Implementation**: Integrated the emerging **Prompt API (`window.ai`)** for Google Gemini Nano and Microsoft Edge AI, with seamless fallback to **Microsoft Foundry Local**.
-- **Tech Stack**: `window.ai.languageModel`, OpenAI-compatible REST APIs, and multi-provider health checks.
-- **Benefit**: Definitive proof of expertise in modern web security, browser-based runtime APIs, and privacy-first AI implementation.
+### 🤖 Zero-Gap AI Resilience
+The **AI Narration Engine** now supports a triple-tier fallback system:
+- **Tier 1 (Browser)**: Chrome Gemini Nano / Edge Phi-4-mini via the Prompt API.
+- **Tier 2 (Local)**: Microsoft Foundry Local for high-fidelity vision tasks.
+- **Tier 3 (Resilient Remote)**: High-speed inference via **Groq** or **Cerebras** (configured in Admin → Settings).
+- **Privacy First**: API keys and model preferences are stored exclusively in `localStorage`.
 
-### 2. The Interactive Terminal (WebContainer Integration)
+## Key Files
+| [foundry-local.ts](file:///c:/Users/LLM-Test/MyLabsPortfolioSite/my-lab-showcase/src/lib/foundry-local.ts) | Unified Resilient AI Bridge |
+| [Admin.tsx](file:///c:/Users/LLM-Test/MyLabsPortfolioSite/my-lab-showcase/src/pages/Admin.tsx) | Settings & Multi-provider status UI |
+| [SuggestionChips.tsx](file:///c:/Users/LLM-Test/MyLabsPortfolioSite/my-lab-showcase/src/components/SuggestionChips.tsx) | Context-aware UI assistant |
 ### 3. The Universal Recorder (rrweb Engine)
 **User Story**: *"As a project lead, I need tools that streamline evidence collection and training."*
 - **Implementation**: Custom injection of `rrweb` into target iframes and external tabs with full session control (Pause/Resume/Stop).
