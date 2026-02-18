@@ -15,8 +15,9 @@ import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { Trash2, Plus, Save, Download, Upload, ArrowLeft, Sparkles, RefreshCw, Cpu, Cloud, FileText, Circle, Rocket } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { checkOnDeviceAIStatus, type OnDeviceAIStatus } from '@/lib/foundry-local';
+import { checkOnDeviceAIStatus, type OnDeviceAIStatus, getAISuggestions } from '@/lib/foundry-local';
 import { generateNarration, type NarrationEngine, type NarrationProgress } from '@/lib/narration-engine';
+import { SuggestionChips } from '@/components/SuggestionChips';
 
 const Admin = () => {
   const { toast } = useToast();
@@ -174,11 +175,11 @@ const Admin = () => {
               <CardHeader><CardTitle>Basic Info</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <div><Label>Name</Label><Input value={profile.name} onChange={e => setProfile({ ...profile, name: e.target.value })} /></div>
-                  <div><Label>Title</Label><Input value={profile.title} onChange={e => setProfile({ ...profile, title: e.target.value })} /></div>
+                  <div><Label>Name</Label><Input value={profile.name} onChange={e => setProfile({ ...profile, name: e.target.value })} /><SuggestionChips field="Name" value={profile.name} onSelect={v => setProfile({ ...profile, name: v })} /></div>
+                  <div><Label>Title</Label><Input value={profile.title} onChange={e => setProfile({ ...profile, title: e.target.value })} /><SuggestionChips field="Professional Title" value={profile.title} onSelect={v => setProfile({ ...profile, title: v })} /></div>
                 </div>
-                <div><Label>Tagline</Label><Input value={profile.tagline} onChange={e => setProfile({ ...profile, tagline: e.target.value })} /></div>
-                <div><Label>Bio</Label><Textarea value={profile.bio} onChange={e => setProfile({ ...profile, bio: e.target.value })} rows={4} /></div>
+                <div><Label>Tagline</Label><Input value={profile.tagline} onChange={e => setProfile({ ...profile, tagline: e.target.value })} /><SuggestionChips field="Tagline" value={profile.tagline} onSelect={v => setProfile({ ...profile, tagline: v })} /></div>
+                <div><Label>Bio</Label><Textarea value={profile.bio} onChange={e => setProfile({ ...profile, bio: e.target.value })} rows={4} /><SuggestionChips field="Professional Bio" value={profile.bio} onSelect={v => setProfile({ ...profile, bio: v })} /></div>
                 <div className="grid sm:grid-cols-3 gap-4">
                   <div><Label>GitHub Username</Label><Input value={profile.githubUsername} onChange={e => setProfile({ ...profile, githubUsername: e.target.value })} /></div>
                   <div><Label>LinkedIn URL</Label><Input value={profile.linkedinUrl} onChange={e => setProfile({ ...profile, linkedinUrl: e.target.value })} /></div>
@@ -196,9 +197,17 @@ const Admin = () => {
               <CardContent className="space-y-3">
                 {profile.skills.map((skill, i) => (
                   <div key={i} className="flex gap-2 items-end">
-                    <div className="flex-1"><Label>Name</Label><Input value={skill.name} onChange={e => updateSkill(i, 'name', e.target.value)} /></div>
+                    <div className="flex-1">
+                      <Label>Name</Label>
+                      <Input value={skill.name} onChange={e => updateSkill(i, 'name', e.target.value)} />
+                      <SuggestionChips field="Skill Name" value={skill.name} onSelect={v => updateSkill(i, 'name', v)} />
+                    </div>
                     <div className="w-24"><Label>Level</Label><Input type="number" min={0} max={100} value={skill.level} onChange={e => updateSkill(i, 'level', parseInt(e.target.value) || 0)} /></div>
-                    <div className="flex-1"><Label>Category</Label><Input value={skill.category} onChange={e => updateSkill(i, 'category', e.target.value)} /></div>
+                    <div className="flex-1">
+                      <Label>Category</Label>
+                      <Input value={skill.category} onChange={e => updateSkill(i, 'category', e.target.value)} />
+                      <SuggestionChips field="Skill Category" value={skill.category} onSelect={v => updateSkill(i, 'category', v)} />
+                    </div>
                     <Button variant="ghost" size="icon" onClick={() => removeSkill(i)}><Trash2 className="h-4 w-4" /></Button>
                   </div>
                 ))}
@@ -318,6 +327,10 @@ const LabForm = ({ lab, onSave, onCancel }: { lab: Lab; onSave: (l: Lab) => void
     const steps = [...form.steps];
     steps[idx] = val;
     setForm({ ...form, steps });
+  };
+
+  const updateField = (field: keyof Lab, val: any) => {
+    setForm({ ...form, [field]: val });
   };
 
   const addMedia = () => {

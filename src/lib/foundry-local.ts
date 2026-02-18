@@ -335,3 +335,38 @@ function computeOverallConfidence(segments: NarrationSegment[]): 'high' | 'mediu
   if (avg >= 1.5) return 'medium';
   return 'low';
 }
+
+/**
+ * Get context-aware suggestion chips for form fields
+ */
+export async function getAISuggestions(
+  field: string,
+  currentValue: string,
+  context?: string
+): Promise<string[]> {
+  const { provider, available } = await checkOnDeviceAIStatus();
+  if (!available) return [];
+
+  const systemPrompt = `You are a professional portfolio assistant. Given a field name and what the user has typed, suggest 3 concise, professional completions or alternatives (max 4 words each). Return ONLY a comma-separated list.`;
+  const userPrompt = `Field: ${field}\nTyped: "${currentValue}"\nContext: ${context || 'N/A'}\nSuggestions:`;
+
+  try {
+    let raw: string;
+    if (provider === 'browser') {
+      raw = await analyzeWithBrowserAI(userPrompt, systemPrompt);
+    } else {
+      raw = await callFoundry([
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ]);
+    }
+
+    return raw.split(',')
+      .map(s => s.trim())
+      .filter(s => s.length > 0 && s.length < 50)
+      .slice(0, 3);
+  } catch (err) {
+    console.warn('AI Suggestions failed:', err);
+    return [];
+  }
+}

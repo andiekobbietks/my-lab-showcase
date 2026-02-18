@@ -25,17 +25,26 @@ Managing your portfolio should be as easy as building it. The `/admin` route pro
 - **Skill Matrix**: Drag-and-drop or simple form entry to update your technical skills and proficiency levels.
 - **Lab Creator**: A sophisticated form to add new projects. defining objectives, environments, and step-by-step processes.
 
-### 3. Unified On-Device AI Narration 🤖
-A unique feature of this portfolio is the **AI Narration Engine**.
-- **Input**: You provide a video or screenshot of your lab.
-- **Process**: The app leverages **Unified On-Device AI** — supporting **Google Gemini Nano** (Chrome), **Microsoft Edge AI**, and **Microsoft Foundry Local**.
-- **Output**: It automatically generates a technical walkthrough and summary locally with maximum privacy and zero latency.
+### 3. Context-Aware AI Suggestion Chips ⚡
+**New in v2.1**: Real-time drafting assistance in the Admin panel.
+- **How it works**: As you fill out your profile or lab details, the **local AI** (Gemini Nano or Foundry) provides suggestion chips for titles, objectives, and skills.
+- **Benefit**: Speeds up documentation and ensures professional, consistent content across your portfolio.
 
 ### 4. Lab Recorder Station (Advanced Showcase) 🎥
-**New in v2.0**: A sophisticated, integrated recording suite for technical evidence.
-- **Interactive Terminal**: Real in-browser Node.js environment powered by **WebContainer API** and `xterm.js`.
-- **Universal Recorder**: Custom `rrweb` engine to capture perfect, low-latency DOM-event sessions from any lab environment.
-- **Draft Workflow**: Seamless **Record → Preview → Save as Draft** lifecycle management.
+A sophisticated, integrated recording suite for technical evidence.
+- **Manual Mode**: Inject `rrweb` into any technical interface (vSphere, Azure, AWS) to record high-fidelity DOM sessions.
+- **Terminal Mode**: A built-in **Interactive WebContainer Terminal** for practicing and recording CLI workflows.
+- **Narrate Flow**: One-click AI narration using your on-device models to turn recordings into searchable technical guides.
+
+## 🧠 Tech Stack Deep-Dive
+- **Frontend**: React, Tailwind CSS, Lucide React, Radix UI.
+- **On-Device AI**: Google Gemini Nano (Prompt API), Microsoft Edge AI, Microsoft Foundry Local.
+- **Terminal**: StackBlitz WebContainers, xterm.js.
+- **Recording**: rrweb (Record and Replay the Web).
+
+## 🚀 Deployment & Security
+- **Netlify**: Configured with strict **COOP/COEP** headers for WebContainer safety.
+- **Privacy**: Local-first AI ensures your lab data never leaves the browser.
 
 > [!TIP]
 > **Hiring Managers & Recruiter Info**: For a deep dive into the architecture, user stories, and IR35 value proposition of these features, see the [Project Showcase Documentation](./docs/PROJECT_SHOWCASE.md).
