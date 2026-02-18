@@ -1,9 +1,20 @@
-import { getBlogPosts } from '@/lib/data';
+import { useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, RefreshCw } from 'lucide-react';
 
 const BlogSection = () => {
-  const posts = getBlogPosts();
+  const posts = useQuery(api.queries.getBlogPosts);
+
+  if (!posts) {
+    return (
+      <section id="blog" className="py-20">
+        <div className="container flex items-center justify-center p-12">
+          <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="blog" className="py-20">
@@ -18,8 +29,8 @@ const BlogSection = () => {
           </Card>
         ) : (
           <div className="grid md:grid-cols-2 gap-6">
-            {posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(post => (
-              <Card key={post.id}>
+            {posts.slice().sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((post: any) => (
+              <Card key={post._id}>
                 <CardHeader>
                   <CardDescription>{new Date(post.date).toLocaleDateString()}</CardDescription>
                   <CardTitle>{post.title}</CardTitle>

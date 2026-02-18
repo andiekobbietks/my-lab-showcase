@@ -1,23 +1,39 @@
 import { useState } from 'react';
-import { saveContact, getProfile } from '@/lib/data';
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '../../convex/_generated/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Github, Linkedin, Mail, Send } from 'lucide-react';
+import { Github, Linkedin, Mail, Send, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const ContactSection = () => {
-  const profile = getProfile();
+  const profile = useQuery(api.queries.getProfile);
+  const saveContactMutation = useMutation(api.mutations.saveContact as any); // I need to add this to mutations if not there
   const { toast } = useToast();
   const [form, setForm] = useState({ name: '', email: '', message: '' });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  if (!profile) {
+    return (
+      <section id="contact" className="py-20">
+        <div className="container flex items-center justify-center p-12">
+          <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </section>
+    );
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    saveContact({ id: crypto.randomUUID(), ...form, date: new Date().toISOString() });
-    toast({ title: 'Message sent!', description: 'Your message has been saved.' });
-    setForm({ name: '', email: '', message: '' });
+    try {
+      await saveContactMutation({ ...form, date: new Date().toISOString() } as any);
+      toast({ title: 'Message sent!', description: 'Your message has been saved in the cloud.' });
+      setForm({ name: '', email: '', message: '' });
+    } catch (err) {
+      toast({ title: 'Error sending message', variant: 'destructive' });
+    }
   };
 
   return (

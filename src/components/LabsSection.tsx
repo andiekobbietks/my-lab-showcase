@@ -1,10 +1,12 @@
 import { useState, useRef } from 'react';
-import { getLabs, Lab, LabMedia } from '@/lib/data';
+import { useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
+import { Lab, LabMedia } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ExternalLink, FlaskConical, Target, Server, CheckCircle2, CircleDot, Play, ChevronLeft, ChevronRight, Sparkles, Cpu, Cloud, FileText, AlertTriangle } from 'lucide-react';
+import { ExternalLink, FlaskConical, Target, Server, CheckCircle2, CircleDot, Play, ChevronLeft, ChevronRight, Sparkles, Cpu, Cloud, FileText, AlertTriangle, RefreshCw } from 'lucide-react';
 
 const sourceConfig = {
   foundry: { label: 'On-Device AI', icon: Cpu },
@@ -179,13 +181,23 @@ const CardThumbnail = ({ lab }: { lab: Lab }) => {
 };
 
 const LabsSection = () => {
-  const labs = getLabs();
-  const [selected, setSelected] = useState<Lab | null>(null);
+  const labs = useQuery(api.queries.getLabs, { status: 'published' });
+  const [selected, setSelected] = useState<any | null>(null);
   const [filter, setFilter] = useState<string | null>(null);
   const [showNarration, setShowNarration] = useState(false);
 
-  const allTags = [...new Set(labs.flatMap(l => l.tags))];
-  const filtered = filter ? labs.filter(l => l.tags.includes(filter)) : labs;
+  if (!labs) {
+    return (
+      <section id="labs" className="py-20">
+        <div className="container flex items-center justify-center p-12">
+          <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </section>
+    );
+  }
+
+  const allTags = [...new Set(labs.flatMap((l: any) => l.tags))];
+  const filtered = filter ? labs.filter((l: any) => l.tags.includes(filter)) : labs;
 
   const hasAnyNarration = selected?.media?.some(m => m.narration) || !!selected?.aiNarration;
 
@@ -211,8 +223,8 @@ const LabsSection = () => {
           </Card>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map(lab => (
-              <Card key={lab.id} className="cursor-pointer hover:border-primary/50 transition-colors overflow-hidden" onClick={() => { setSelected(lab); setShowNarration(false); }}>
+            {filtered.map((lab: any) => (
+              <Card key={lab._id} className="cursor-pointer hover:border-primary/50 transition-colors overflow-hidden" onClick={() => { setSelected(lab); setShowNarration(false); }}>
                 <CardHeader className="relative">
                   <CardThumbnail lab={lab} />
                   <CardTitle className="text-lg">{lab.title}</CardTitle>

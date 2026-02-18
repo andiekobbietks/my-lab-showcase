@@ -1,12 +1,24 @@
-import { getProfile } from '@/lib/data';
+import { useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Award } from 'lucide-react';
+import { Award, RefreshCw } from 'lucide-react';
 
 const AboutSection = () => {
-  const profile = getProfile();
-  const categories = [...new Set(profile.skills.map(s => s.category))];
+  const profile = useQuery(api.queries.getProfile);
+
+  if (!profile) {
+    return (
+      <section id="about" className="py-20 bg-card/50">
+        <div className="container flex items-center justify-center p-12">
+          <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </section>
+    );
+  }
+
+  const categories = [...new Set(profile.skills.map((s: any) => s.category))];
 
   return (
     <section id="about" className="py-20 bg-card/50">

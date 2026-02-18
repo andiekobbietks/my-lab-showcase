@@ -5,7 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Rocket, Copy, Play, ArrowLeft, Download, ExternalLink, Maximize, Save, Terminal as TerminalIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { saveLab, type Lab } from '@/lib/data';
+import { useMutation } from 'convex/react';
+import { api } from '../../convex/_generated/api';
+import { type Lab } from '@/lib/data';
 import WebTerminal from '@/components/WebTerminal';
 
 // The recorder script injects rrweb from CDN into the TARGET page (not our app)
@@ -79,6 +81,7 @@ const RECORD_SCRIPT = `
 
 const LabRecorder = () => {
     const navigate = useNavigate();
+    const saveLabMutation = useMutation(api.mutations.saveLab);
     const [url, setUrl] = useState("https://192.168.1.50/ui");
     const [events, setEvents] = useState<any[]>([]);
     const [jsonInput, setJsonInput] = useState("");
@@ -88,7 +91,7 @@ const LabRecorder = () => {
     const [draftTitle, setDraftTitle] = useState('');
     const [draftSaved, setDraftSaved] = useState(false);
 
-    const handleSaveAsDraft = () => {
+    const handleSaveAsDraft = async () => {
         if (!draftTitle.trim()) {
             alert('Please enter a title for your draft lab.');
             return;
@@ -97,22 +100,23 @@ const LabRecorder = () => {
             alert('No recording loaded. Import events first.');
             return;
         }
-        const newLab: Lab = {
-            id: crypto.randomUUID(),
-            title: draftTitle,
-            description: `rrweb recording with ${events.length} events`,
-            tags: ['rrweb-recording', 'draft'],
-            objective: '',
-            environment: '',
-            steps: ['Recording captured via Lab Recorder Station'],
-            outcome: '',
-            createdAt: new Date().toISOString(),
-            status: 'draft',
-            rrwebRecording: JSON.stringify(events),
-        };
-        saveLab(newLab);
-        setDraftSaved(true);
-        alert(`✅ Draft lab "${draftTitle}" saved! Go to Admin → Labs to review and edit.`);
+        try {
+            await saveLabMutation({
+                title: draftTitle,
+                description: `rrweb recording with ${events.length} events`,
+                tags: ['rrweb-recording', 'draft'],
+                objective: '',
+                environment: '',
+                steps: ['Recording captured via Lab Recorder Station'],
+                outcome: '',
+                status: 'draft',
+                rrwebRecording: JSON.stringify(events),
+            });
+            setDraftSaved(true);
+            alert(`✅ Draft lab "${draftTitle}" saved to Convex! Go to Admin → Labs to review and edit.`);
+        } catch (err) {
+            alert('❌ Failed to save draft to Convex.');
+        }
     };
 
     const handleCopyScript = () => {

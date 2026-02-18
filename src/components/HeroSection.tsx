@@ -1,9 +1,18 @@
-import { getProfile } from '@/lib/data';
+import { useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
 import { Button } from '@/components/ui/button';
-import { Github, Linkedin, Mail, ArrowDown } from 'lucide-react';
+import { Github, Linkedin, Mail, ArrowDown, RefreshCw } from 'lucide-react';
 
 const HeroSection = () => {
-  const profile = getProfile();
+  const profile = useQuery(api.queries.getProfile);
+
+  if (!profile) {
+    return (
+      <section className="min-h-[50vh] flex items-center justify-center">
+        <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+      </section>
+    );
+  }
 
   return (
     <section className="min-h-screen flex items-center justify-center relative overflow-hidden">

@@ -1,10 +1,21 @@
-import { getProfile } from '@/lib/data';
+import { useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, FileText } from 'lucide-react';
+import { Download, FileText, RefreshCw } from 'lucide-react';
 
 const CVSection = () => {
-  const profile = getProfile();
+  const profile = useQuery(api.queries.getProfile);
+
+  if (!profile) {
+    return (
+      <section id="cv" className="py-20 bg-card/50">
+        <div className="container flex items-center justify-center p-12">
+          <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="cv" className="py-20 bg-card/50">
