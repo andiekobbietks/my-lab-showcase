@@ -75,6 +75,13 @@ Managing your portfolio should be as easy as building it. The `/admin` route pro
 - **Skill Matrix**: Drag-and-drop or simple form entry to update your technical skills and proficiency levels.
 - **Lab Creator**: A sophisticated form to add new projects. defining objectives, environments, and step-by-step processes.
 
+#### 🎥 Technical Audit & Restoration
+To ensure system integrity during the Convex migration, a full technical audit and restoration was performed on the Admin Dashboard.
+
+| **Investigation (Audit)** | **Restoration (Success)** |
+| :--- | :--- |
+| ![Admin Audit](./docs/assets/admin_audit.webp) | ![Admin Restoration](./docs/assets/admin_restoration.webp) |
+
 ### 3. Context-Aware AI Suggestion Chips ⚡
 **New in v2.1**: Real-time drafting assistance in the Admin panel.
 - **How it works**: As you fill out your profile or lab details, the **local or resilient remote AI** provides suggestion chips for titles, objectives, and skills.
