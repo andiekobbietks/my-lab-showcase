@@ -59,12 +59,12 @@ Demonstrates immediate impact on internal tools and DX (Developer Experience). I
 ---
 
 ## 📸 Guided Tour
-
+ 
 ### Admin Dashboard Overview
 ![Admin Panel](./assets/01_admin_panel.png)
-
+ 
 ### The Interactive Terminal
 ![Terminal Tab](./assets/03_recorder_terminal_tab.png)
-
+ 
 ### Session Recording & Draft Management
 ![Drafts Badge](./assets/04_admin_labs_list_drafts.png)

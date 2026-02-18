@@ -1,6 +1,6 @@
 # My Lab Showcase
 
-![Hero Section](./hero_section.png)
+![Hero Section](./docs/assets/hero_section.png)
 
 
 This project is a comprehensive portfolio designed to showcase hands-on technical labs, skills, and certifications. It features a public-facing showpiece and a powerful private admin panel for content management.
@@ -10,6 +10,23 @@ This project is a comprehensive portfolio designed to showcase hands-on technica
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/andiekobbietks/my-lab-showcase)
 [![Launch Localhost](https://img.shields.io/badge/Launch-Localhost-blue?style=for-the-badge&logo=visual-studio-code)](./launch.bat)
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/andiekobbietks/my-lab-showcase)
+
+## 🗺️ Strategic User Journey
+
+```mermaid
+graph TD
+    User([Recruiter/Hiring Manager]) --> Public[Public Portfolio]
+    Public --> Labs[Filterable Lab Grid]
+    Labs --> Detail[Deep-Dive Technical View]
+    Detail --> Proof[Interactive Replay/Narraion]
+    
+    Admin([Portfolio Owner]) --> Panel[Admin Panel]
+    Panel --> Create[Lab Creator & Recorder]
+    Create --> AI[On-Device AI Narration]
+    AI --> Publish[Live Portfolio Update]
+```
+
+> **Accessibility Caption**: This diagram shows two primary workflows. The Hiring Manager journey starts at the Public Portfolio, moves through a filterable Lab Grid to a Deep-Dive Technical View, and ends with Proof of work via interactive replays. The Portfolio Owner journey starts at the Admin Panel, moves to Create/Record, through AI Narration, and ends with Publishing to the live site.
 
 ## 🚀 User Journey & Features
 
@@ -23,7 +40,7 @@ The entry point is a high-impact, responsive landing page designed to convert vi
 ### 2. The Admin Experience (Content Management)
 Managing your portfolio should be as easy as building it. The `/admin` route provides a secure, local-first CMS.
 
-![Admin Dashboard](./admin_header.png)
+![Admin Dashboard](./docs/assets/admin_header.png)
 
 - **Profile Editor**: Update your bio, title, and social links in real-time.
 - **Skill Matrix**: Drag-and-drop or simple form entry to update your technical skills and proficiency levels.
@@ -42,6 +59,23 @@ Managing your portfolio should be as easy as building it. The `/admin` route pro
   2. **Secondary**: Microsoft Foundry Local for high-fidelity technical vision tasks.
   3. **Resilience Fallback**: High-speed remote inference via **Groq** or **Cerebras** (fallback configured in Admin settings).
 - **Benefit**: Proof of expertise in distributed AI systems, multi-provider integration, and "Zero-Gap" technical resiliency.
+
+### ♾️ AI Resilience & Logic Flow
+
+```mermaid
+graph LR
+    Input[Lab Content] --> Detect{Provider Status}
+    
+    Detect -->|Gemini Nano/Edge Ready| Browser[Built-in AI]
+    Detect -->|Foundry Online| Foundry[Foundry Local Vision]
+    Detect -->|Keys Found| Remote[Groq/Cerebras LPU]
+    
+    Browser --> Narration[Technical Walkthrough]
+    Foundry --> Narration
+    Remote --> Narration
+```
+
+> **Accessibility Caption**: This flowchart illustrates the "Zero-Gap" AI logic. Lab content serves as input. The status is detected across three tiers: Browser AI (Primary), Foundry Local (Secondary), and Remote Fallback (Groq/Cerebras). All tiers converge to generate the final Technical Walkthrough narration.
 
 ### 4. Lab Recorder Station (Advanced Showcase) 🎥
 A sophisticated, integrated recording suite for technical evidence.
