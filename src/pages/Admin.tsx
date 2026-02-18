@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { Trash2, Plus, Save, Download, Upload, ArrowLeft, Sparkles, RefreshCw, Cpu, Cloud, FileText, Circle } from 'lucide-react';
+import { Trash2, Plus, Save, Download, Upload, ArrowLeft, Sparkles, RefreshCw, Cpu, Cloud, FileText, Circle, Rocket } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { checkFoundryStatus } from '@/lib/foundry-local';
 import { generateNarration, type NarrationEngine, type NarrationProgress } from '@/lib/narration-engine';
@@ -155,6 +155,9 @@ const Admin = () => {
                 <input type="file" accept=".json" className="hidden" onChange={handleImport} />
               </label>
             </Button>
+            <Button variant="default" size="sm" onClick={() => navigate('/admin/recorder')} className="bg-blue-600 hover:bg-blue-700">
+              <Rocket className="h-4 w-4 mr-2" />Recorder
+            </Button>
           </div>
         </div>
 
@@ -233,7 +236,15 @@ const Admin = () => {
                   {labs.map(lab => (
                     <Card key={lab.id} className="flex items-center justify-between p-4">
                       <div>
-                        <p className="font-semibold text-foreground">{lab.title || 'Untitled'}</p>
+                        <p className="font-semibold text-foreground">
+                          {lab.title || 'Untitled'}
+                          {lab.status === 'draft' && (
+                            <Badge className="ml-2 bg-yellow-500/10 text-yellow-500 border-yellow-500/20">DRAFT</Badge>
+                          )}
+                          {lab.rrwebRecording && (
+                            <Badge variant="outline" className="ml-2 text-xs">🎥 Recording</Badge>
+                          )}
+                        </p>
                         <p className="text-sm text-muted-foreground">{lab.tags.join(', ')}</p>
                       </div>
                       <div className="flex gap-2">

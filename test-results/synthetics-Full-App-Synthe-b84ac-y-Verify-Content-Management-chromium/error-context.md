@@ -1,0 +1,193 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - region "Notifications alt+T"
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - button [ref=e7] [cursor=pointer]:
+          - img
+        - heading "Admin Panel" [level=1] [ref=e8]
+      - generic [ref=e9]:
+        - button "Export" [ref=e10] [cursor=pointer]:
+          - img
+          - text: Export
+        - generic [ref=e11] [cursor=pointer]:
+          - img
+          - text: Import
+    - generic [ref=e12]:
+      - tablist [ref=e13]:
+        - tab "Profile" [selected] [ref=e14] [cursor=pointer]
+        - tab "Labs" [ref=e15] [cursor=pointer]
+        - tab "Blog" [ref=e16] [cursor=pointer]
+      - tabpanel "Profile" [ref=e17]:
+        - generic [ref=e18]:
+          - heading "Basic Info" [level=3] [ref=e20]
+          - generic [ref=e21]:
+            - generic [ref=e22]:
+              - generic [ref=e23]:
+                - text: Name
+                - textbox [ref=e24]: Your Name
+              - generic [ref=e25]:
+                - text: Title
+                - textbox [ref=e26]: Cloud & SDDC Infrastructure Engineer
+            - generic [ref=e27]:
+              - text: Tagline
+              - textbox [ref=e28]: Building software-defined data centres — from home lab to production.
+            - generic [ref=e29]:
+              - text: Bio
+              - textbox [ref=e30]: Infrastructure engineer with CCNA certification, AWS re/Start graduate, and a passion for VMware SDDC, cloud platforms, and automation. Currently building hands-on lab environments that mirror real-world enterprise deployments.
+            - generic [ref=e31]:
+              - generic [ref=e32]:
+                - text: GitHub Username
+                - textbox [ref=e33]
+              - generic [ref=e34]:
+                - text: LinkedIn URL
+                - textbox [ref=e35]
+              - generic [ref=e36]:
+                - text: Email
+                - textbox [ref=e37]
+            - generic [ref=e38]:
+              - text: CV URL (link to PDF)
+              - textbox "https://..." [ref=e39]
+        - generic [ref=e40]:
+          - generic [ref=e41]:
+            - heading "Skills" [level=3] [ref=e42]
+            - button "Add" [ref=e43] [cursor=pointer]:
+              - img
+              - text: Add
+          - generic [ref=e44]:
+            - generic [ref=e45]:
+              - generic [ref=e46]:
+                - text: Name
+                - textbox [ref=e47]: VMware vSphere
+              - generic [ref=e48]:
+                - text: Level
+                - spinbutton [ref=e49]: "70"
+              - generic [ref=e50]:
+                - text: Category
+                - textbox [ref=e51]: Virtualisation
+              - button [ref=e52] [cursor=pointer]:
+                - img
+            - generic [ref=e53]:
+              - generic [ref=e54]:
+                - text: Name
+                - textbox [ref=e55]: vSAN
+              - generic [ref=e56]:
+                - text: Level
+                - spinbutton [ref=e57]: "60"
+              - generic [ref=e58]:
+                - text: Category
+                - textbox [ref=e59]: Virtualisation
+              - button [ref=e60] [cursor=pointer]:
+                - img
+            - generic [ref=e61]:
+              - generic [ref=e62]:
+                - text: Name
+                - textbox [ref=e63]: NSX-T
+              - generic [ref=e64]:
+                - text: Level
+                - spinbutton [ref=e65]: "55"
+              - generic [ref=e66]:
+                - text: Category
+                - textbox [ref=e67]: Networking
+              - button [ref=e68] [cursor=pointer]:
+                - img
+            - generic [ref=e69]:
+              - generic [ref=e70]:
+                - text: Name
+                - textbox [ref=e71]: Networking (CCNA)
+              - generic [ref=e72]:
+                - text: Level
+                - spinbutton [ref=e73]: "80"
+              - generic [ref=e74]:
+                - text: Category
+                - textbox [ref=e75]: Networking
+              - button [ref=e76] [cursor=pointer]:
+                - img
+            - generic [ref=e77]:
+              - generic [ref=e78]:
+                - text: Name
+                - textbox [ref=e79]: AWS
+              - generic [ref=e80]:
+                - text: Level
+                - spinbutton [ref=e81]: "65"
+              - generic [ref=e82]:
+                - text: Category
+                - textbox [ref=e83]: Cloud
+              - button [ref=e84] [cursor=pointer]:
+                - img
+            - generic [ref=e85]:
+              - generic [ref=e86]:
+                - text: Name
+                - textbox [ref=e87]: Linux
+              - generic [ref=e88]:
+                - text: Level
+                - spinbutton [ref=e89]: "70"
+              - generic [ref=e90]:
+                - text: Category
+                - textbox [ref=e91]: Systems
+              - button [ref=e92] [cursor=pointer]:
+                - img
+            - generic [ref=e93]:
+              - generic [ref=e94]:
+                - text: Name
+                - textbox [ref=e95]: PowerCLI
+              - generic [ref=e96]:
+                - text: Level
+                - spinbutton [ref=e97]: "50"
+              - generic [ref=e98]:
+                - text: Category
+                - textbox [ref=e99]: Automation
+              - button [ref=e100] [cursor=pointer]:
+                - img
+            - generic [ref=e101]:
+              - generic [ref=e102]:
+                - text: Name
+                - textbox [ref=e103]: Terraform
+              - generic [ref=e104]:
+                - text: Level
+                - spinbutton [ref=e105]: "45"
+              - generic [ref=e106]:
+                - text: Category
+                - textbox [ref=e107]: Automation
+              - button [ref=e108] [cursor=pointer]:
+                - img
+        - generic [ref=e109]:
+          - generic [ref=e110]:
+            - heading "Certifications" [level=3] [ref=e111]
+            - button "Add" [ref=e112] [cursor=pointer]:
+              - img
+              - text: Add
+          - generic [ref=e113]:
+            - generic [ref=e114]:
+              - generic [ref=e115]:
+                - text: Name
+                - textbox [ref=e116]: CCNA
+              - generic [ref=e117]:
+                - text: Issuer
+                - textbox [ref=e118]: Cisco
+              - generic [ref=e119]:
+                - text: Year
+                - textbox [ref=e120]: "2024"
+              - button [ref=e121] [cursor=pointer]:
+                - img
+            - generic [ref=e122]:
+              - generic [ref=e123]:
+                - text: Name
+                - textbox [ref=e124]: AWS re/Start Graduate
+              - generic [ref=e125]:
+                - text: Issuer
+                - textbox [ref=e126]: Amazon Web Services
+              - generic [ref=e127]:
+                - text: Year
+                - textbox [ref=e128]: "2024"
+              - button [ref=e129] [cursor=pointer]:
+                - img
+        - button "Save Profile" [ref=e130] [cursor=pointer]:
+          - img
+          - text: Save Profile
+```

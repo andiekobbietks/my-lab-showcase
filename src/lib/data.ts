@@ -24,6 +24,8 @@ export interface Lab {
   aiNarration?: string;
   narrationSource?: 'foundry' | 'cloud' | 'text';
   createdAt: string;
+  status?: 'draft' | 'published';
+  rrwebRecording?: string; // JSON string of rrweb events
 }
 
 export interface BlogPost {
