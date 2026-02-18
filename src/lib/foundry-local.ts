@@ -21,7 +21,12 @@ declare global {
   }
 }
 
-export type AIProvider = 'browser' | 'foundry' | 'none';
+export type AIProvider = 'browser' | 'foundry' | 'remote' | 'none';
+
+export interface RemoteAIConfig {
+  provider: 'groq' | 'cerebras';
+  apiKey: string;
+}
 
 export interface OnDeviceAIStatus {
   available: boolean;
@@ -39,11 +44,11 @@ export interface NarrationResult {
   narration: string;
   segments: NarrationSegment[];
   overallConfidence: 'high' | 'medium' | 'low';
-  source: 'foundry' | 'browser' | 'cloud' | 'text';
+  source: 'foundry' | 'browser' | 'remote' | 'cloud' | 'text';
 }
 
 /**
- * Check for available on-device AI providers
+ * Check for available on-device AI providers with remote fallback
  */
 export async function checkOnDeviceAIStatus(): Promise<OnDeviceAIStatus> {
   // 1. Check Browser Built-in AI (window.ai)
@@ -79,7 +84,20 @@ export async function checkOnDeviceAIStatus(): Promise<OnDeviceAIStatus> {
       };
     }
   } catch {
-    // Both unavailable
+    // Local foundries unavailable
+  }
+
+  // 3. Remote Fallback (Groq/Cerebras)
+  const remoteKey = localStorage.getItem('portfolio_remote_ai_key');
+  const remoteProvider = localStorage.getItem('portfolio_remote_ai_provider') as 'groq' | 'cerebras';
+
+  if (remoteKey && remoteProvider) {
+    return {
+      available: true,
+      provider: 'remote',
+      models: remoteProvider === 'groq' ? ['llama-3.1-70b'] : ['llama-3.1-70b'],
+      message: `${remoteProvider === 'groq' ? 'Groq' : 'Cerebras'} Active`,
+    };
   }
 
   return { available: false, provider: 'none', models: [] };
@@ -212,7 +230,39 @@ async function analyzeWithBrowserAI(
 }
 
 /**
- * Unified On-Device Analysis (Foundry Local or Browser AI)
+ * Call Remote AI service (Groq/Cerebras) with OpenAI-compatible API
+ */
+async function callRemoteAI(messages: any[]): Promise<string> {
+  const key = localStorage.getItem('portfolio_remote_ai_key');
+  const provider = localStorage.getItem('portfolio_remote_ai_provider') || 'groq';
+
+  const baseUrl = provider === 'groq'
+    ? 'https://api.groq.com/openai/v1/chat/completions'
+    : 'https://api.cerebras.ai/v1/chat/completions';
+
+  const model = provider === 'groq' ? 'llama-3.1-70b-versatile' : 'llama3.1-70b';
+
+  const res = await fetch(baseUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${key}`
+    },
+    body: JSON.stringify({
+      model,
+      messages,
+      temperature: 0.1,
+      max_tokens: 2048
+    })
+  });
+
+  if (!res.ok) throw new Error(`${provider} API failed: ${res.statusText}`);
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || '';
+}
+
+/**
+ * Unified On-Device Analysis (Foundry Local, Browser AI, or Remote Fallback)
  */
 export async function analyzeOnDevice(
   frames: ExtractedFrame[],
@@ -221,21 +271,29 @@ export async function analyzeOnDevice(
 ): Promise<NarrationResult> {
   const { provider } = await checkOnDeviceAIStatus();
 
-  if (provider === 'browser') {
-    // Since Browser AI (window.ai) is currently low-power and doesn't support direct vision easily
-    // We use a simplified single-pass with exhaustive metadata to compensate
+  if (provider === 'browser' || provider === 'remote') {
+    // Text-based fallback for providers that don't support direct vision in this context
     const metadata = buildMetadataContext(lab);
     const systemPrompt = "You are a Technical Lab Narrator. Based on the lab steps and objective, create a professional narration. Prefix each step with [HIGH] confidence.";
     const userPrompt = `Lab: ${lab.title}\nMetadata:\n${metadata}\n\nObjective: ${lab.objective}\n\nPlease narrate the demonstration based on these steps.`;
 
-    const narration = await analyzeWithBrowserAI(userPrompt, systemPrompt);
+    let narration: string;
+    if (provider === 'browser') {
+      narration = await analyzeWithBrowserAI(userPrompt, systemPrompt);
+    } else {
+      narration = await callRemoteAI([
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ]);
+    }
+
     const segments = parseNarrationSegments(narration);
 
     return {
       narration,
       segments,
       overallConfidence: 'high',
-      source: 'browser',
+      source: provider as any,
     };
   }
 
@@ -354,6 +412,11 @@ export async function getAISuggestions(
     let raw: string;
     if (provider === 'browser') {
       raw = await analyzeWithBrowserAI(userPrompt, systemPrompt);
+    } else if (provider === 'remote') {
+      raw = await callRemoteAI([
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ]);
     } else {
       raw = await callFoundry([
         { role: 'system', content: systemPrompt },

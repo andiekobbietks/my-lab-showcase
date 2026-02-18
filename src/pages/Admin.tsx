@@ -167,6 +167,7 @@ const Admin = () => {
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="labs">Labs</TabsTrigger>
             <TabsTrigger value="blog">Blog</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
           {/* PROFILE TAB */}
@@ -291,6 +292,59 @@ const Admin = () => {
               </>
             )}
           </TabsContent>
+
+          {/* SETTINGS TAB */}
+          <TabsContent value="settings" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Cpu className="h-5 w-5 text-blue-500" />
+                  Remote AI Fallback (Resilience)
+                </CardTitle>
+                <CardDescription>
+                  Configure a high-speed remote API (Groq or Cerebras) to ensure AI features work even when local browser flags are disabled.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Remote Provider</Label>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={localStorage.getItem('portfolio_remote_ai_provider') === 'groq' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => {
+                        localStorage.setItem('portfolio_remote_ai_provider', 'groq');
+                        toast({ title: 'Remote Provider set to Groq' });
+                        checkOnDeviceAIStatus().then(setOnDeviceStatus);
+                      }}
+                    >Groq (LPU Speed)</Button>
+                    <Button
+                      variant={localStorage.getItem('portfolio_remote_ai_provider') === 'cerebras' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => {
+                        localStorage.setItem('portfolio_remote_ai_provider', 'cerebras');
+                        toast({ title: 'Remote Provider set to Cerebras' });
+                        checkOnDeviceAIStatus().then(setOnDeviceStatus);
+                      }}
+                    >Cerebras (Fastest Inference)</Button>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>API Key</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="password"
+                      placeholder="gsk_..."
+                      defaultValue={localStorage.getItem('portfolio_remote_ai_key') || ''}
+                      onChange={(e) => localStorage.setItem('portfolio_remote_ai_key', e.target.value)}
+                    />
+                    <Button variant="secondary" onClick={() => checkOnDeviceAIStatus().then(setOnDeviceStatus)}>Verify</Button>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">KEYS ARE STORED LOCALLY IN YOUR BROWSER ONLY.</p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
     </div>
@@ -306,6 +360,8 @@ const confidenceConfig = {
 
 const sourceConfig = {
   foundry: { label: 'On-Device AI', icon: Cpu },
+  browser: { label: 'Browser AI', icon: Sparkles },
+  remote: { label: 'Remote AI (Fallback)', icon: Rocket },
   cloud: { label: 'Cloud AI', icon: Cloud },
   text: { label: 'Text-Based', icon: FileText },
 };
