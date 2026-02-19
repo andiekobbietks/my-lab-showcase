@@ -13,11 +13,30 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { Trash2, Plus, Save, Download, Upload, ArrowLeft, Sparkles, RefreshCw, Cpu, Cloud, FileText, Circle, Rocket, FlaskConical, BookOpen, ExternalLink, Link2, Monitor, Layout } from 'lucide-react';
+import { Trash2, Plus, Save, Download, Upload, ArrowLeft, Sparkles, RefreshCw, Cpu, Cloud, FileText, Circle, Rocket, FlaskConical, BookOpen, ExternalLink, Link2, Monitor, Layout, Play } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useNavigate } from 'react-router-dom';
 import { checkOnDeviceAIStatus, type OnDeviceAIStatus, getAISuggestions } from '@/lib/foundry-local';
 import { generateNarration, type NarrationEngine, type NarrationProgress } from '@/lib/narration-engine';
 import { SuggestionChips } from '@/components/SuggestionChips';
+
+// Dynamic rrweb player loader
+const loadRRWebPlayer = () => {
+  return new Promise((resolve) => {
+    if ((window as any).replayer) {
+      resolve((window as any).replayer);
+      return;
+    }
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://cdn.jsdelivr.net/npm/rrweb-player@latest/dist/style.css';
+    document.head.appendChild(link);
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/rrweb-player@latest/dist/index.js';
+    script.onload = () => resolve((window as any).rrwebPlayer);
+    document.head.appendChild(script);
+  });
+};
 
 const Admin = () => {
   const { toast } = useToast();
@@ -39,6 +58,7 @@ const Admin = () => {
   const [editLab, setEditLab] = useState<any | null>(null);
   const [editPost, setEditPost] = useState<any | null>(null);
   const [onDeviceStatus, setOnDeviceStatus] = useState<OnDeviceAIStatus | null>(null);
+  const [replayingLab, setReplayingLab] = useState<any | null>(null);
 
   // CRITICAL FIX: Handle empty database by falling back to defaultProfile for initialization
   useEffect(() => {
@@ -356,50 +376,111 @@ const Admin = () => {
                   </div>
                   <Button onClick={() => setEditLab({
                     title: '', description: '', tags: [], objective: '',
-                    environment: '', steps: [''], outcome: '', repoUrl: '', media: []
+                    environment: '', steps: [''], outcome: '', repoUrl: '', media: [],
+                    status: 'draft'
                   })} size="lg" className="rounded-2xl h-14 px-8 font-bold"><Plus className="h-5 w-5 mr-2" />Deploy New Lab</Button>
                 </div>
 
-                <div className="grid gap-4">
-                  {convexLabs === undefined ? (
-                    <div className="flex items-center justify-center p-20"><RefreshCw className="h-10 w-10 animate-spin text-primary" /></div>
-                  ) : convexLabs.length === 0 ? (
-                    <div className="p-24 text-center bg-background/20 rounded-3xl border border-dashed border-border/60">
-                      <FlaskConical className="h-16 w-16 text-muted-foreground/20 mx-auto mb-6" />
-                      <h3 className="text-xl font-bold mb-2">No Labs registered</h3>
-                      <p className="text-muted-foreground mb-8">Ready to showcase your infrastructure build-outs?</p>
-                      <Button variant="outline" onClick={() => setEditLab({ title: '', description: '', tags: [], objective: '', environment: '', steps: [''], outcome: '', repoUrl: '', media: [] })} className="rounded-xl border-dashed">Start first deployment</Button>
+                <div className="grid gap-8">
+                  {/* Drafts Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 px-2">
+                      <div className="h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
+                      <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Historical Evidence Archive (Private)</h3>
                     </div>
-                  ) : (
-                    convexLabs.map((lab: any) => (
-                      <Card key={lab._id} className="group p-6 bg-card/40 hover:bg-card hover:border-primary/30 transition-all duration-300 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-6 overflow-hidden relative">
-                        <div className="absolute top-0 left-0 w-1.5 h-full bg-primary/20 group-hover:bg-primary transition-colors" />
-                        <div className="flex items-center gap-6 w-full">
-                          <div className="h-16 w-16 bg-secondary/50 rounded-2xl flex items-center justify-center shrink-0">
-                            <FlaskConical className="h-8 w-8 text-primary/40 group-hover:text-primary transition-colors" />
+                    {convexLabs === undefined ? (
+                      <div className="flex items-center justify-center p-12"><RefreshCw className="h-8 w-8 animate-spin text-primary/40" /></div>
+                    ) : convexLabs.filter((l: any) => l.status === 'draft').length === 0 ? (
+                      <div className="p-8 text-center bg-secondary/10 rounded-2xl border border-dashed border-border/40">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">No pending drafts</p>
+                      </div>
+                    ) : (
+                      convexLabs.filter((l: any) => l.status === 'draft').map((lab: any) => (
+                        <Card key={lab._id} className="group p-6 bg-card/40 hover:bg-card hover:border-primary/30 transition-all duration-300 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-6 overflow-hidden relative">
+                          <div className="absolute top-0 left-0 w-1.5 h-full bg-primary/20 group-hover:bg-primary transition-colors" />
+                          <div className="flex items-center gap-6 w-full">
+                            <div className="h-16 w-16 bg-secondary/50 rounded-2xl flex items-center justify-center shrink-0">
+                              <FlaskConical className="h-8 w-8 text-primary/40 group-hover:text-primary transition-colors" />
+                            </div>
+                            <div className="flex-1 space-y-1">
+                              <div className="flex items-center gap-2">
+                                <h3 className="text-xl font-bold tracking-tight">{lab.title || 'Untitled Archive'}</h3>
+                                <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20 text-[10px] h-5">ARCHIVED</Badge>
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {lab.tags.map((t: string) => <Badge key={t} variant="secondary" className="px-2 py-0 text-[10px] font-mono tracking-tighter opacity-70">{t}</Badge>)}
+                                {lab.rrwebRecording && <span className="flex items-center gap-1 text-[10px] font-bold text-blue-500 uppercase tracking-[0.1em] ml-2"><Rocket className="h-3 w-3" /> Live Capture</span>}
+                              </div>
+                            </div>
                           </div>
-                          <div className="flex-1 space-y-1">
-                            <div className="flex items-center gap-2">
-                              <h3 className="text-xl font-bold tracking-tight">{lab.title || 'Untitled Archive'}</h3>
-                              {lab.status === 'draft' ? (
-                                <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20 text-[10px] h-5">DRAFT</Badge>
-                              ) : (
+                          <div className="flex gap-2 w-full sm:w-auto">
+                            {lab.rrwebRecording && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setReplayingLab(lab)}
+                                className="rounded-xl flex-1 px-4 border-blue-500/30 text-blue-500 hover:bg-blue-500/5"
+                              >
+                                <Play className="h-4 w-4 mr-2" />Replay Evidence
+                              </Button>
+                            )}
+                            <Button variant="outline" size="sm" onClick={() => setEditLab(lab)} className="rounded-xl flex-1 px-6 border-border/60">Modify</Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleDeleteLab(lab._id)} className="text-muted-foreground hover:text-red-500 rounded-xl"><Trash2 className="h-4 w-4" /></Button>
+                          </div>
+                        </Card>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Published Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 px-2">
+                      <div className="h-2 w-2 rounded-full bg-green-500" />
+                      <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Portfolio Showcase Registry (Public)</h3>
+                    </div>
+                    {convexLabs === undefined ? (
+                      <div className="flex items-center justify-center p-12"><RefreshCw className="h-8 w-8 animate-spin text-primary/40" /></div>
+                    ) : convexLabs.filter((l: any) => l.status === 'published').length === 0 ? (
+                      <div className="p-8 text-center bg-secondary/10 rounded-2xl border border-dashed border-border/40">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">No published labs</p>
+                      </div>
+                    ) : (
+                      convexLabs.filter((l: any) => l.status === 'published').map((lab: any) => (
+                        <Card key={lab._id} className="group p-6 bg-card/40 hover:bg-card hover:border-primary/30 transition-all duration-300 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-6 overflow-hidden relative">
+                          <div className="absolute top-0 left-0 w-1.5 h-full bg-primary/20 group-hover:bg-primary transition-colors" />
+                          <div className="flex items-center gap-6 w-full">
+                            <div className="h-16 w-16 bg-secondary/50 rounded-2xl flex items-center justify-center shrink-0">
+                              <FlaskConical className="h-8 w-8 text-primary/40 group-hover:text-primary transition-colors" />
+                            </div>
+                            <div className="flex-1 space-y-1">
+                              <div className="flex items-center gap-2">
+                                <h3 className="text-xl font-bold tracking-tight">{lab.title || 'Untitled Archive'}</h3>
                                 <Badge className="bg-green-500/10 text-green-500 border-green-500/20 text-[10px] h-5">PUBLISHED</Badge>
-                              )}
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              {lab.tags.map((t: string) => <Badge key={t} variant="secondary" className="px-2 py-0 text-[10px] font-mono tracking-tighter opacity-70">{t}</Badge>)}
-                              {lab.rrwebRecording && <span className="flex items-center gap-1 text-[10px] font-bold text-blue-500 uppercase tracking-[0.1em] ml-2"><Rocket className="h-3 w-3" /> Live Capture</span>}
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {lab.tags.map((t: string) => <Badge key={t} variant="secondary" className="px-2 py-0 text-[10px] font-mono tracking-tighter opacity-70">{t}</Badge>)}
+                                {lab.rrwebRecording && <span className="flex items-center gap-1 text-[10px] font-bold text-blue-500 uppercase tracking-[0.1em] ml-2"><Rocket className="h-3 w-3" /> Live Capture</span>}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="flex gap-2 w-full sm:w-auto">
-                          <Button variant="outline" size="sm" onClick={() => setEditLab(lab)} className="rounded-xl flex-1 px-6 border-border/60">Modify</Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDeleteLab(lab._id)} className="text-muted-foreground hover:text-red-500 rounded-xl"><Trash2 className="h-4 w-4" /></Button>
-                        </div>
-                      </Card>
-                    ))
-                  )}
+                          <div className="flex gap-2 w-full sm:w-auto">
+                            {lab.rrwebRecording && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setReplayingLab(lab)}
+                                className="rounded-xl flex-1 px-4 border-blue-500/30 text-blue-500 hover:bg-blue-500/5"
+                              >
+                                <Play className="h-4 w-4 mr-2" />Replay Evidence
+                              </Button>
+                            )}
+                            <Button variant="outline" size="sm" onClick={() => setEditLab(lab)} className="rounded-xl flex-1 px-6 border-border/60">Modify</Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleDeleteLab(lab._id)} className="text-muted-foreground hover:text-red-500 rounded-xl"><Trash2 className="h-4 w-4" /></Button>
+                          </div>
+                        </Card>
+                      ))
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -417,40 +498,77 @@ const Admin = () => {
                     <p className="text-muted-foreground text-sm font-medium">Manage technical blog posts and industry reflections.</p>
                   </div>
                   <Button onClick={() => setEditPost({
-                    title: '', content: '', date: new Date().toISOString().split('T')[0]
+                    title: '', content: '', date: new Date().toISOString().split('T')[0],
+                    status: 'draft'
                   })} size="lg" className="rounded-2xl h-14 px-8 font-bold"><Plus className="h-5 w-5 mr-2" />New Post</Button>
                 </div>
 
-                <div className="grid gap-4">
-                  {convexPosts === undefined ? (
-                    <div className="flex items-center justify-center p-20"><RefreshCw className="h-10 w-10 animate-spin text-primary" /></div>
-                  ) : convexPosts.length === 0 ? (
-                    <div className="p-24 text-center bg-background/20 rounded-3xl border border-dashed border-border/60">
-                      <BookOpen className="h-16 w-16 text-muted-foreground/20 mx-auto mb-6" />
-                      <h3 className="text-xl font-bold mb-2">Knowledge Base Empty</h3>
-                      <p className="text-muted-foreground mb-8">Ready to share your insights with the world?</p>
-                      <Button variant="outline" onClick={() => setEditPost({ title: '', content: '', date: new Date().toISOString().split('T')[0] })} className="rounded-xl border-dashed">Write first post</Button>
+                <div className="grid gap-8">
+                  {/* Drafts Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 px-2">
+                      <div className="h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
+                      <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Draft Queue (Private)</h3>
                     </div>
-                  ) : (
-                    convexPosts.map((post: any) => (
-                      <Card key={post._id} className="group p-6 bg-card/40 hover:bg-card hover:border-primary/30 transition-all duration-300 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-6 overflow-hidden relative">
-                        <div className="absolute top-0 left-0 w-1.5 h-full bg-primary/20 group-hover:bg-primary transition-colors" />
-                        <div className="flex-1 space-y-1">
-                          <div className="flex items-center gap-3 mb-1">
-                            <span className="text-[10px] font-mono text-muted-foreground bg-secondary/30 px-2 py-0.5 rounded-md uppercase tracking-widest">{post.date}</span>
-                            <div className="h-1 w-1 rounded-full bg-border" />
-                            <span className="text-[10px] font-bold text-primary uppercase">Active Article</span>
+                    {convexPosts === undefined ? (
+                      <div className="flex items-center justify-center p-12"><RefreshCw className="h-8 w-8 animate-spin text-primary/40" /></div>
+                    ) : convexPosts.filter((p: any) => p.status === 'draft').length === 0 ? (
+                      <div className="p-8 text-center bg-secondary/10 rounded-2xl border border-dashed border-border/40">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">No pending drafts</p>
+                      </div>
+                    ) : (
+                      convexPosts.filter((p: any) => p.status === 'draft').map((post: any) => (
+                        <Card key={post._id} className="group p-6 bg-card/40 hover:bg-card hover:border-primary/30 transition-all duration-300 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-6 overflow-hidden relative">
+                          <div className="absolute top-0 left-0 w-1.5 h-full bg-primary/20 group-hover:bg-primary transition-colors" />
+                          <div className="flex-1 space-y-1">
+                            <div className="flex items-center gap-3 mb-1">
+                              <span className="text-[10px] font-mono text-muted-foreground bg-secondary/30 px-2 py-0.5 rounded-md uppercase tracking-widest">{post.date}</span>
+                              <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20 text-[10px] h-5">DRAFT</Badge>
+                            </div>
+                            <h3 className="text-xl font-bold tracking-tight">{post.title || 'Untitled Draft'}</h3>
+                            <p className="text-xs text-muted-foreground font-light line-clamp-1 italic">"{post.content.slice(0, 100)}..."</p>
                           </div>
-                          <h3 className="text-xl font-bold tracking-tight">{post.title || 'Untitled Draft'}</h3>
-                          <p className="text-xs text-muted-foreground font-light line-clamp-1 italic">"{post.content.slice(0, 100)}..."</p>
-                        </div>
-                        <div className="flex gap-2 w-full sm:w-auto">
-                          <Button variant="outline" size="sm" onClick={() => setEditPost(post)} className="rounded-xl flex-1 px-6 border-border/60">Refine</Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDeletePost(post._id)} className="text-muted-foreground hover:text-red-500 rounded-xl"><Trash2 className="h-4 w-4" /></Button>
-                        </div>
-                      </Card>
-                    ))
-                  )}
+                          <div className="flex gap-2 w-full sm:w-auto">
+                            <Button variant="outline" size="sm" onClick={() => setEditPost(post)} className="rounded-xl flex-1 px-6 border-border/60">Refine</Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleDeletePost(post._id)} className="text-muted-foreground hover:text-red-500 rounded-xl"><Trash2 className="h-4 w-4" /></Button>
+                          </div>
+                        </Card>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Published Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 px-2">
+                      <div className="h-2 w-2 rounded-full bg-green-500" />
+                      <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Published Registry (Public)</h3>
+                    </div>
+                    {convexPosts === undefined ? (
+                      <div className="flex items-center justify-center p-12"><RefreshCw className="h-8 w-8 animate-spin text-primary/40" /></div>
+                    ) : convexPosts.filter((p: any) => p.status === 'published' || !p.status).length === 0 ? (
+                      <div className="p-8 text-center bg-secondary/10 rounded-2xl border border-dashed border-border/40">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">No published articles</p>
+                      </div>
+                    ) : (
+                      convexPosts.filter((p: any) => p.status === 'published' || !p.status).map((post: any) => (
+                        <Card key={post._id} className="group p-6 bg-card/40 hover:bg-card hover:border-primary/30 transition-all duration-300 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-6 overflow-hidden relative">
+                          <div className="absolute top-0 left-0 w-1.5 h-full bg-primary/20 group-hover:bg-primary transition-colors" />
+                          <div className="flex-1 space-y-1">
+                            <div className="flex items-center gap-3 mb-1">
+                              <span className="text-[10px] font-mono text-muted-foreground bg-secondary/30 px-2 py-0.5 rounded-md uppercase tracking-widest">{post.date}</span>
+                              <Badge className="bg-green-500/10 text-green-500 border-green-500/20 text-[10px] h-5">PUBLISHED</Badge>
+                            </div>
+                            <h3 className="text-xl font-bold tracking-tight">{post.title || 'Untitled Article'}</h3>
+                            <p className="text-xs text-muted-foreground font-light line-clamp-1 italic">"{post.content.slice(0, 100)}..."</p>
+                          </div>
+                          <div className="flex gap-2 w-full sm:w-auto">
+                            <Button variant="outline" size="sm" onClick={() => setEditPost(post)} className="rounded-xl flex-1 px-6 border-border/60">Refine</Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleDeletePost(post._id)} className="text-muted-foreground hover:text-red-500 rounded-xl"><Trash2 className="h-4 w-4" /></Button>
+                          </div>
+                        </Card>
+                      ))
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -737,6 +855,31 @@ const LabForm = ({ lab, onSave, onCancel, onDeviceStatus }: { lab: Lab; onSave: 
               <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={4} className="rounded-2xl bg-secondary/30 resize-none" />
             </div>
             <div className="space-y-3">
+              <Label className="text-xs font-bold uppercase tracking-widest ml-1">Release Status</Label>
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  variant={form.status === 'draft' ? 'default' : 'outline'}
+                  size="sm"
+                  className="flex-1 rounded-xl h-12 uppercase tracking-widest text-[10px] font-black"
+                  onClick={() => setForm({ ...form, status: 'draft' })}
+                >
+                  <Circle className={`h-3 w-3 mr-2 ${form.status === 'draft' ? 'fill-blue-500 text-blue-500' : ''}`} />
+                  Archive Evidence
+                </Button>
+                <Button
+                  type="button"
+                  variant={form.status === 'published' ? 'default' : 'outline'}
+                  size="sm"
+                  className="flex-1 rounded-xl h-12 uppercase tracking-widest text-[10px] font-black"
+                  onClick={() => setForm({ ...form, status: 'published' })}
+                >
+                  <Rocket className={`h-3 w-3 mr-2 ${form.status === 'published' ? 'text-green-500' : ''}`} />
+                  Live Release
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-3">
               <Label className="text-xs font-bold uppercase tracking-widest ml-1">Project Classification (Tags)</Label>
               <Input value={form.tags.join(', ')} onChange={e => setForm({ ...form, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })} placeholder="e.g. VMware, NSX-T, Automation" className="h-12 rounded-xl bg-secondary/30" />
             </div>
@@ -963,7 +1106,7 @@ const PostForm = ({ post, onSave, onCancel }: { post: BlogPost; onSave: (p: Blog
         </div>
       </CardHeader>
       <CardContent className="p-8 space-y-8 animate-in slide-in-from-bottom-4 duration-500">
-        <div className="grid sm:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-4 gap-6">
           <div className="sm:col-span-2 space-y-3">
             <Label className="text-xs font-bold uppercase tracking-widest ml-1">Article Headline</Label>
             <Input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="h-14 rounded-xl text-xl font-bold bg-secondary/30" placeholder="Insight Title..." />
@@ -971,6 +1114,29 @@ const PostForm = ({ post, onSave, onCancel }: { post: BlogPost; onSave: (p: Blog
           <div className="space-y-3">
             <Label className="text-xs font-bold uppercase tracking-widest ml-1">Publication Date</Label>
             <Input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} className="h-14 rounded-xl bg-secondary/30 font-mono" />
+          </div>
+          <div className="space-y-3">
+            <Label className="text-xs font-bold uppercase tracking-widest ml-1">Status</Label>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant={form.status === 'draft' ? 'default' : 'outline'}
+                size="sm"
+                className="flex-1 h-14 rounded-xl text-[10px] font-black uppercase tracking-widest"
+                onClick={() => setForm({ ...form, status: 'draft' })}
+              >
+                Draft
+              </Button>
+              <Button
+                type="button"
+                variant={form.status === 'published' ? 'default' : 'outline'}
+                size="sm"
+                className="flex-1 h-14 rounded-xl text-[10px] font-black uppercase tracking-widest"
+                onClick={() => setForm({ ...form, status: 'published' })}
+              >
+                Live
+              </Button>
+            </div>
           </div>
         </div>
         <div className="space-y-3">

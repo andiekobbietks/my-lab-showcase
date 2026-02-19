@@ -8,6 +8,10 @@ export const updateProfile = mutation({
         title: v.string(),
         tagline: v.string(),
         bio: v.string(),
+        heroTitle: v.optional(v.string()),
+        heroSubtitle: v.optional(v.string()),
+        aboutTitle: v.optional(v.string()),
+        aboutContent: v.optional(v.string()),
         githubUsername: v.string(),
         linkedinUrl: v.string(),
         email: v.string(),
@@ -102,5 +106,33 @@ export const deleteBlogPost = mutation({
     args: { id: v.id("blogPosts") },
     handler: async (ctx, args) => {
         await ctx.db.delete(args.id);
+    },
+});
+
+export const updateTheme = mutation({
+    args: {
+        id: v.optional(v.id("theme")),
+        primaryColor: v.string(),
+        secondaryColor: v.string(),
+        accentColor: v.string(),
+        backgroundColor: v.string(),
+        radius: v.string(),
+        fontSans: v.string(),
+        fontSerif: v.string(),
+        isDark: v.boolean(),
+    },
+    handler: async (ctx, args) => {
+        const { id, ...data } = args;
+        if (id) {
+            await ctx.db.patch(id, data);
+            return id;
+        } else {
+            const existing = await ctx.db.query("theme").first();
+            if (existing) {
+                await ctx.db.patch(existing._id, data);
+                return existing._id;
+            }
+            return await ctx.db.insert("theme", data);
+        }
     },
 });

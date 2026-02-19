@@ -22,6 +22,9 @@ const SAMPLE_POSTS = [
 const BlogSection = () => {
   const convexPosts = useQuery(api.queries.getBlogPosts);
 
+  // Client-side filtering as fallback or until query is updated
+  const publishedPosts = convexPosts?.filter((p: any) => p.status === 'published' || !p.status);
+
   if (convexPosts === undefined) {
     return (
       <section id="blog" className="py-20">
@@ -33,7 +36,7 @@ const BlogSection = () => {
   }
 
   // Use cloud posts or fallback to samples
-  const posts = (convexPosts && convexPosts.length > 0) ? convexPosts : SAMPLE_POSTS;
+  const posts = (publishedPosts && publishedPosts.length > 0) ? publishedPosts : SAMPLE_POSTS;
 
   return (
     <section id="blog" className="py-24 bg-background">

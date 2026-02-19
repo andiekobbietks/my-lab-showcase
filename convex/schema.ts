@@ -31,6 +31,10 @@ export default defineSchema({
         title: v.string(),
         tagline: v.string(),
         bio: v.string(),
+        heroTitle: v.optional(v.string()),
+        heroSubtitle: v.optional(v.string()),
+        aboutTitle: v.optional(v.string()),
+        aboutContent: v.optional(v.string()),
         githubUsername: v.string(),
         linkedinUrl: v.string(),
         email: v.string(),
@@ -47,11 +51,23 @@ export default defineSchema({
         cvUrl: v.optional(v.string()),
     }),
 
+    theme: defineTable({
+        primaryColor: v.string(), // HSL string: "216 19% 26%"
+        secondaryColor: v.string(),
+        accentColor: v.string(),
+        backgroundColor: v.string(),
+        radius: v.string(), // e.g. "0.75rem"
+        fontSans: v.string(),
+        fontSerif: v.string(),
+        isDark: v.boolean(),
+    }),
+
     blogPosts: defineTable({
         title: v.string(),
         content: v.string(),
         date: v.string(),
-    }),
+        status: v.optional(v.string()), // 'draft' | 'published'
+    }).index("by_status", ["status"]),
 
     contactMessages: defineTable({
         name: v.string(),

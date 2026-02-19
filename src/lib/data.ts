@@ -6,7 +6,7 @@ export interface LabMedia {
   caption?: string;
   narration?: string;
   narrationConfidence?: 'high' | 'medium' | 'low';
-  narrationSource?: 'foundry' | 'browser' | 'cloud' | 'text';
+  narrationSource?: 'foundry' | 'browser' | 'cloud' | 'text' | 'remote';
 }
 
 export interface Lab {
@@ -33,6 +33,7 @@ export interface BlogPost {
   title: string;
   content: string;
   date: string;
+  status?: 'draft' | 'published';
 }
 
 export interface Profile {
@@ -40,12 +41,27 @@ export interface Profile {
   title: string;
   tagline: string;
   bio: string;
+  heroTitle?: string;
+  heroSubtitle?: string;
+  aboutTitle?: string;
+  aboutContent?: string;
   githubUsername: string;
   linkedinUrl: string;
   email: string;
   skills: Skill[];
   certifications: Certification[];
   cvUrl?: string;
+}
+
+export interface Theme {
+  primaryColor: string;
+  secondaryColor: string;
+  accentColor: string;
+  backgroundColor: string;
+  radius: string;
+  fontSans: string;
+  fontSerif: string;
+  isDark: boolean;
 }
 
 export interface Skill {
@@ -97,6 +113,17 @@ export const defaultProfile: Profile = {
     { name: 'CCNA', issuer: 'Cisco', year: '2024' },
     { name: 'AWS re/Start Graduate', issuer: 'Amazon Web Services', year: '2024' },
   ],
+};
+
+export const defaultTheme: Theme = {
+  primaryColor: '216 19% 26%',
+  secondaryColor: '215 19% 34%',
+  accentColor: '210 40% 98%',
+  backgroundColor: '209 40% 96%',
+  radius: '0.75rem',
+  fontSans: 'DM Sans',
+  fontSerif: 'Crimson Pro',
+  isDark: false,
 };
 
 function get<T>(key: string, fallback: T): T {

@@ -203,27 +203,37 @@ const LabRecorder = () => {
     }, [events, replayerLoaded]);
 
     return (
-        <div className="min-h-screen bg-background">
-            <div className="container mx-auto p-6 space-y-6 max-w-6xl">
+        <div className="min-h-screen bg-background p-4 md:p-8">
+            <div className="container max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500">
                 {/* Header */}
-                <div className="flex items-center gap-3">
-                    <Button variant="ghost" size="icon" onClick={() => navigate('/admin')}>
-                        <ArrowLeft className="h-5 w-5" />
-                    </Button>
-                    <h1 className="text-3xl font-bold flex items-center gap-2 text-foreground">
-                        <Rocket className="h-8 w-8 text-blue-600" />
-                        Lab Recorder Station
-                    </h1>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+                    <div className="flex items-center gap-4">
+                        <Button variant="ghost" size="icon" onClick={() => navigate('/admin')} className="h-12 w-12 rounded-2xl bg-secondary/50 hover:bg-secondary">
+                            <ArrowLeft className="h-6 w-6" />
+                        </Button>
+                        <div>
+                            <h1 className="text-4xl font-black text-foreground tracking-tighter uppercase flex items-center gap-3">
+                                <Rocket className="h-10 w-10 text-blue-600" />
+                                Lab Recorder Station
+                            </h1>
+                            <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest mt-1 ml-1">Evidence Capture & Specification Hub</p>
+                        </div>
+                    </div>
+                    <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={() => navigate('/admin')} className="rounded-xl border-border/60">
+                            Back to Registry
+                        </Button>
+                    </div>
                 </div>
 
-                <Tabs defaultValue="record" className="w-full">
-                    <TabsList>
-                        <TabsTrigger value="record">🔴 Record</TabsTrigger>
-                        <TabsTrigger value="terminal" className="gap-2">
+                <Tabs defaultValue="record" className="space-y-8">
+                    <TabsList className="bg-secondary/30 p-1 border border-border/40 rounded-2xl w-full flex overflow-x-auto h-auto scrollbar-hide">
+                        <TabsTrigger value="record" className="rounded-xl px-6 py-3 data-[state=active]:bg-background data-[state=active]:shadow-md">🔴 Record</TabsTrigger>
+                        <TabsTrigger value="terminal" className="rounded-xl px-6 py-3 data-[state=active]:bg-background data-[state=active]:shadow-md gap-2">
                             <TerminalIcon className="h-4 w-4" /> Terminal
                         </TabsTrigger>
-                        <TabsTrigger value="import">📥 Import</TabsTrigger>
-                        <TabsTrigger value="preview">▶️ Preview</TabsTrigger>
+                        <TabsTrigger value="import" className="rounded-xl px-6 py-3 data-[state=active]:bg-background data-[state=active]:shadow-md">📥 Import</TabsTrigger>
+                        <TabsTrigger value="preview" className="rounded-xl px-6 py-3 data-[state=active]:bg-background data-[state=active]:shadow-md">▶️ Preview</TabsTrigger>
                     </TabsList>
 
                     {/* 🖥️ TERMINAL TAB */}
@@ -240,46 +250,57 @@ const LabRecorder = () => {
                     </TabsContent>
 
                     {/* ═══════════ RECORD TAB ═══════════ */}
-                    <TabsContent value="record" className="space-y-4">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Target Lab URL</CardTitle>
-                                <CardDescription>Enter the URL of your vSphere/ESXi client. The iframe below will attempt to load it.</CardDescription>
+                    <TabsContent value="record" className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
+                        <Card className="bg-card/40 border-border/50 rounded-3xl overflow-hidden p-2">
+                            <CardHeader className="p-8 pb-4">
+                                <CardTitle className="text-2xl font-black uppercase tracking-tighter">Target Lab Infrastructure</CardTitle>
+                                <CardDescription className="text-xs font-bold uppercase tracking-widest text-primary/60">Configure orchestration endpoint for evidence capture</CardDescription>
                             </CardHeader>
-                            <CardContent className="flex gap-4">
-                                <Input value={url} onChange={(e) => setUrl(e.target.value)} className="font-mono" placeholder="https://192.168.1.50/ui" />
-                                <Button variant="outline" onClick={() => iframeRef.current?.setAttribute('src', url)}>Load</Button>
-                                <Button variant="default" className="bg-green-600 hover:bg-green-700 gap-2 whitespace-nowrap" onClick={() => window.open(url, '_blank', 'noopener')}>
-                                    <Maximize className="h-4 w-4" /> Open Full Screen
-                                </Button>
+                            <CardContent className="p-8 pt-0 flex flex-col md:flex-row gap-4">
+                                <div className="relative flex-1 group">
+                                    <Input value={url} onChange={(e) => setUrl(e.target.value)} className="font-mono h-14 rounded-2xl bg-secondary/30 pr-12 focus:bg-background transition-all" placeholder="https://192.168.1.50/ui" />
+                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-30 group-focus-within:opacity-100 transition-opacity">
+                                        <ExternalLink className="h-5 w-5" />
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <Button variant="secondary" onClick={() => iframeRef.current?.setAttribute('src', url)} className="h-14 px-8 rounded-2xl font-bold">Initialize</Button>
+                                    <Button variant="default" className="bg-blue-600 hover:bg-blue-700 h-14 px-8 rounded-2xl font-bold gap-3 shadow-lg shadow-blue-500/20" onClick={() => window.open(url, '_blank', 'noopener')}>
+                                        <Maximize className="h-5 w-5" /> Open Full Screen
+                                    </Button>
+                                </div>
                             </CardContent>
                         </Card>
 
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             {/* LEFT: Iframe */}
-                            <div className="lg:col-span-2 border rounded-lg h-[500px] bg-gray-900 relative overflow-hidden">
+                            <div className="lg:col-span-2 border border-border/50 rounded-[2rem] h-[600px] bg-secondary/20 relative overflow-hidden shadow-inner group">
                                 <iframe
                                     ref={iframeRef}
                                     src={url}
-                                    className="w-full h-full border-0"
+                                    title="Lab Infrastructure Preview"
+                                    className="w-full h-full border-0 grayscale-[0.5] group-hover:grayscale-0 transition-all duration-700"
                                     sandbox="allow-same-origin allow-scripts allow-forms"
                                 />
-                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 flex items-center justify-between">
-                                    <p className="text-white text-xs">⚠️ If this iframe is blank/blocked, use <b>Manual Mode</b> → or click <b>Open Full Screen</b> above</p>
-                                    <Button size="sm" variant="secondary" className="gap-1 text-xs" onClick={() => window.open(url, '_blank', 'noopener')}>
-                                        <ExternalLink className="h-3 w-3" /> New Tab
+                                <div className="absolute bottom-6 left-6 right-6 bg-background/80 backdrop-blur-md border border-border/40 p-4 rounded-2xl flex items-center justify-between shadow-2xl animate-in slide-in-from-bottom-2">
+                                    <div>
+                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-1">Infrastructure Status</p>
+                                        <p className="text-muted-foreground text-xs font-medium">If frame is blocked (X-Frame-Options), use <b>Full Screen</b> mode.</p>
+                                    </div>
+                                    <Button size="sm" variant="secondary" className="gap-2 text-[10px] font-black uppercase h-9 px-4 rounded-xl" onClick={() => window.open(url, '_blank', 'noopener')}>
+                                        <ExternalLink className="h-3 w-3" /> New Window
                                     </Button>
                                 </div>
                             </div>
 
                             {/* RIGHT: Manual Instructions */}
-                            <div className="space-y-4">
-                                <Card className="border-blue-500/20 bg-blue-500/5">
-                                    <CardHeader>
-                                        <CardTitle className="text-lg">📋 Manual Recording</CardTitle>
-                                        <CardDescription>The recommended approach — works with any web UI:</CardDescription>
+                            <div className="space-y-6">
+                                <Card className="border-primary/20 bg-primary/5 rounded-[2rem] overflow-hidden">
+                                    <CardHeader className="p-8 pb-4">
+                                        <CardTitle className="text-xl font-black uppercase tracking-tight">Technical Evidence Protocol</CardTitle>
+                                        <CardDescription className="text-[10px] font-bold uppercase tracking-widest opacity-60">High-Fidelity Manual Capture Strategy</CardDescription>
                                     </CardHeader>
-                                    <CardContent className="space-y-4 text-sm">
+                                    <CardContent className="p-8 pt-0 space-y-6 text-sm">
                                         <ol className="list-decimal list-inside space-y-3 text-muted-foreground">
                                             <li>
                                                 <strong className="text-foreground">Open Lab in New Tab</strong>

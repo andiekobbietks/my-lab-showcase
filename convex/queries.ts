@@ -34,3 +34,10 @@ export const getBlogPosts = query({
         return await ctx.db.query("blogPosts").collect();
     },
 });
+
+export const getTheme = query({
+    args: {},
+    handler: async (ctx) => {
+        return await ctx.db.query("theme").first();
+    },
+});
