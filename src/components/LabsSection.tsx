@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { useSafeQuery } from '@/hooks/use-safe-query';
+import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Lab, LabMedia } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -194,7 +194,7 @@ const SAMPLE_LABS: Partial<Lab>[] = [
 ];
 
 const LabsSection = () => {
-  const convexLabs = useSafeQuery(api.queries.getLabs, { status: 'published' });
+  const convexLabs = useQuery(api.queries.getLabs, { status: 'published' });
   const [selected, setSelected] = useState<any | null>(null);
   const [filter, setFilter] = useState<string | null>(null);
   const [showNarration, setShowNarration] = useState(false);

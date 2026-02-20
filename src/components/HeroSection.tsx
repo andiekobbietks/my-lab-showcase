@@ -1,11 +1,11 @@
+import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Button } from '@/components/ui/button';
 import { Github, Linkedin, Mail, ArrowDown, RefreshCw } from 'lucide-react';
 import { defaultProfile } from '@/lib/data';
-import { useSafeQuery } from '@/hooks/use-safe-query';
 
 const HeroSection = () => {
-  const convexProfile = useSafeQuery(api.queries.getProfile);
+  const convexProfile = useQuery(api.queries.getProfile);
 
   // Still loading from cloud
   if (convexProfile === undefined) {
