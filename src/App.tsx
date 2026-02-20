@@ -50,8 +50,16 @@ const App = () => {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/admin/recorder" element={<LabRecorder />} />
+              <Route path="/admin" element={
+                <ConvexErrorBoundary fallback={<div className="min-h-screen bg-background flex items-center justify-center"><div className="text-center space-y-4"><h1 className="text-2xl font-bold text-foreground">Admin Panel</h1><p className="text-muted-foreground">Convex backend is unavailable. Please deploy your functions first.</p><p className="text-sm text-muted-foreground font-mono">npx convex deploy</p><a href="/" className="text-primary underline block mt-4">← Back to site</a></div></div>}>
+                  <Admin />
+                </ConvexErrorBoundary>
+              } />
+              <Route path="/admin/recorder" element={
+                <ConvexErrorBoundary fallback={<div className="min-h-screen bg-background flex items-center justify-center"><p className="text-muted-foreground">Convex unavailable. <a href="/" className="text-primary underline">Go home</a></p></div>}>
+                  <LabRecorder />
+                </ConvexErrorBoundary>
+              } />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
