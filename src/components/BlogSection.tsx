@@ -1,8 +1,8 @@
+import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BookOpen, RefreshCw, Calendar, ArrowRight } from 'lucide-react';
-import { useSafeQuery } from '@/hooks/use-safe-query';
 
 const SAMPLE_POSTS = [
   {
@@ -20,7 +20,7 @@ const SAMPLE_POSTS = [
 ];
 
 const BlogSection = () => {
-  const convexPosts = useSafeQuery(api.queries.getBlogPosts);
+  const convexPosts = useQuery(api.queries.getBlogPosts);
 
   // Client-side filtering as fallback or until query is updated
   const publishedPosts = convexPosts?.filter((p: any) => p.status === 'published' || !p.status);

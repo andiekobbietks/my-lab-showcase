@@ -1,12 +1,12 @@
+import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { RefreshCw, Github, ExternalLink, Star, GitFork } from 'lucide-react';
 import { defaultProfile } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { useSafeQuery } from '@/hooks/use-safe-query';
 
 const GitHubSection = () => {
-  const convexProfile = useSafeQuery(api.queries.getProfile);
+  const convexProfile = useQuery(api.queries.getProfile);
 
   if (convexProfile === undefined) {
     return (

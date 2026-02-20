@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
+import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { defaultTheme } from '@/lib/data';
-import { useSafeQuery } from '@/hooks/use-safe-query';
 
 export const ThemeEngine = () => {
-    const customTheme = useSafeQuery(api.queries.getTheme);
+    const customTheme = useQuery(api.queries.getTheme);
 
     useEffect(() => {
         const theme = customTheme || defaultTheme;

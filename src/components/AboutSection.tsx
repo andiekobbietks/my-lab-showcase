@@ -1,13 +1,13 @@
+import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Award, RefreshCw, User, Star } from 'lucide-react';
 import { defaultProfile } from '@/lib/data';
-import { useSafeQuery } from '@/hooks/use-safe-query';
 
 const AboutSection = () => {
-  const convexProfile = useSafeQuery(api.queries.getProfile);
+  const convexProfile = useQuery(api.queries.getProfile);
 
   if (convexProfile === undefined) {
     return (
