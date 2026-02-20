@@ -6,7 +6,7 @@ export interface LabMedia {
   caption?: string;
   narration?: string;
   narrationConfidence?: 'high' | 'medium' | 'low';
-  narrationSource?: 'foundry' | 'browser' | 'cloud' | 'text' | 'remote';
+  narrationSource?: 'foundry' | 'browser' | 'cloud' | 'text';
 }
 
 export interface Lab {
