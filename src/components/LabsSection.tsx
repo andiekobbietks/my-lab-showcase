@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { useQuery } from 'convex/react';
+import { useSafeQuery } from '@/hooks/use-safe-query';
 import { api } from '../../convex/_generated/api';
 import { Lab, LabMedia } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -194,7 +194,7 @@ const SAMPLE_LABS: Partial<Lab>[] = [
 ];
 
 const LabsSection = () => {
-  const convexLabs = useQuery(api.queries.getLabs, { status: 'published' });
+  const convexLabs = useSafeQuery(api.queries.getLabs, { status: 'published' });
   const [selected, setSelected] = useState<any | null>(null);
   const [filter, setFilter] = useState<string | null>(null);
   const [showNarration, setShowNarration] = useState(false);
@@ -212,7 +212,7 @@ const LabsSection = () => {
 
   // Use cloud data or show sample data to keep UI rich
   const labs = (convexLabs && convexLabs.length > 0) ? convexLabs : SAMPLE_LABS;
-  const allTags = [...new Set((labs || []).flatMap((l: any) => l.tags || []))];
+  const allTags = [...new Set((labs || []).flatMap((l: any) => l.tags || []))] as string[];
   const filtered = filter ? (labs || []).filter((l: any) => (l.tags || []).includes(filter)) : (labs || []);
 
   const hasAnyNarration = selected?.media?.some((m: any) => m.narration) || !!selected?.aiNarration;
