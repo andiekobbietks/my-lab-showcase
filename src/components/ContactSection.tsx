@@ -12,7 +12,7 @@ import { defaultProfile } from '@/lib/data';
 
 const ContactSection = () => {
   const convexProfile = useQuery(api.queries.getProfile);
-  const saveContactMutation = useMutation(api.mutations.saveContact);
+  // Contact form submits via mailto for now (no saveContact mutation exists)
   const { toast } = useToast();
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [sending, setSending] = useState(false);
@@ -33,8 +33,11 @@ const ContactSection = () => {
     e.preventDefault();
     setSending(true);
     try {
-      await saveContactMutation({ ...form, date: new Date().toISOString() });
-      toast({ title: 'Message sent!', description: 'Your message has been saved in the cloud.' });
+      // Open mailto link as fallback
+      const subject = encodeURIComponent(`Contact from ${form.name}`);
+      const body = encodeURIComponent(`From: ${form.name} (${form.email})\n\n${form.message}`);
+      window.open(`mailto:${profile.email}?subject=${subject}&body=${body}`, '_blank');
+      toast({ title: 'Message prepared!', description: 'Your email client should open shortly.' });
       setForm({ name: '', email: '', message: '' });
     } catch (err) {
       toast({ title: 'Error sending message', variant: 'destructive' });

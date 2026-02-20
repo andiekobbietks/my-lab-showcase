@@ -44,7 +44,7 @@ export interface NarrationResult {
   narration: string;
   segments: NarrationSegment[];
   overallConfidence: 'high' | 'medium' | 'low';
-  source: 'foundry' | 'browser' | 'remote' | 'cloud' | 'text';
+  source: 'foundry' | 'browser' | 'cloud' | 'text';
 }
 
 /**
@@ -293,7 +293,7 @@ export async function analyzeOnDevice(
       narration,
       segments,
       overallConfidence: 'high',
-      source: provider as any,
+      source: provider === 'remote' ? 'cloud' : provider === 'browser' ? 'browser' : 'foundry',
     };
   }
 

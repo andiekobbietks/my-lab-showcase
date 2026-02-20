@@ -800,7 +800,7 @@ const LabForm = ({ lab, onSave, onCancel, onDeviceStatus }: { lab: Lab; onSave: 
           ...updatedMedia[mr.mediaIndex],
           narration: mr.result.narration,
           narrationConfidence: mr.result.overallConfidence,
-          narrationSource: mr.result.source,
+          narrationSource: mr.result.source as LabMedia['narrationSource'],
         };
       }
 
@@ -808,7 +808,7 @@ const LabForm = ({ lab, onSave, onCancel, onDeviceStatus }: { lab: Lab; onSave: 
         ...form,
         media: updatedMedia,
         aiNarration: summary.narration,
-        narrationSource: summary.source,
+        narrationSource: summary.source as Lab['narrationSource'],
       });
 
       toast({ title: 'Narration generated!', description: `Source: ${sourceConfig[summary.source].label}` });
