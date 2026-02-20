@@ -1,13 +1,13 @@
-import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Award, RefreshCw, User, Star } from 'lucide-react';
 import { defaultProfile } from '@/lib/data';
+import { useSafeQuery } from '@/hooks/use-safe-query';
 
 const AboutSection = () => {
-  const convexProfile = useQuery(api.queries.getProfile);
+  const convexProfile = useSafeQuery(api.queries.getProfile);
 
   if (convexProfile === undefined) {
     return (
@@ -21,7 +21,7 @@ const AboutSection = () => {
 
   // Use cloud profile or fallback to original default
   const profile = convexProfile || defaultProfile;
-  const categories = [...new Set((profile.skills || []).map((s: any) => s.category))];
+  const categories = [...new Set((profile.skills || []).map((s: any) => s.category))] as string[];
 
   return (
     <section id="about" className="py-24 bg-gradient-to-b from-background to-card/50 border-y border-border/50">

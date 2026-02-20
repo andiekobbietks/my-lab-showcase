@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery, useMutation } from 'convex/react';
+import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,9 +9,10 @@ import { Label } from '@/components/ui/label';
 import { Github, Linkedin, Mail, Send, RefreshCw, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { defaultProfile } from '@/lib/data';
+import { useSafeQuery } from '@/hooks/use-safe-query';
 
 const ContactSection = () => {
-  const convexProfile = useQuery(api.queries.getProfile);
+  const convexProfile = useSafeQuery(api.queries.getProfile);
   // Contact form submits via mailto for now (no saveContact mutation exists)
   const { toast } = useToast();
   const [form, setForm] = useState({ name: '', email: '', message: '' });

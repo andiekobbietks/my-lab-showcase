@@ -1,12 +1,12 @@
-import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, FileText, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { defaultProfile } from '@/lib/data';
+import { useSafeQuery } from '@/hooks/use-safe-query';
 
 const CVSection = () => {
-  const convexProfile = useQuery(api.queries.getProfile);
+  const convexProfile = useSafeQuery(api.queries.getProfile);
 
   if (convexProfile === undefined) {
     return (
